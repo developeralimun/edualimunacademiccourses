@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0f;
+    --deep: #0f0f1a;
+    --card: #14141f;
+    --card2: #1a1a2e;
+    --border: #2e2e4a;
+    --accent: #9B6DFF;
+    --accent2: #FF6BF8;
+    --gold: #FFD700;
+    --white: #ffffff;
+    --light: #e8e8ff;
+    --muted: #aaaacc;
+    --green: #00e676;
+    --orange: #ff7043;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Inter', 'Hind Siliguri', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, #0a0a0f 0%, #1a0a35 45%, #0f0f20 100%);
+    position: relative;
+    padding: 48px 20px 60px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 800px; height: 500px;
+    background: radial-gradient(ellipse, rgba(155,109,255,0.2) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(155,109,255,0.15);
+    border: 1px solid rgba(155,109,255,0.5);
+    border-radius: 50px; padding: 7px 18px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
+    color: #c9a8ff; text-transform: uppercase;
+    margin-bottom: 20px; position: relative; z-index: 1;
+  }
+
+  .badge .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+  .hero-title {
+    font-size: clamp(38px, 7vw, 76px);
+    font-weight: 900; line-height: 1.0;
+    position: relative; z-index: 1; margin-bottom: 10px;
+  }
+  .hero-title .t1 { color: #ffffff; display: block; }
+  .hero-title .t2 {
+    display: block;
+    background: linear-gradient(90deg, #9B6DFF, #FF6BF8, #FFD700);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 17px; color: #c0c0e0; line-height: 1.65;
+    max-width: 520px; margin: 12px auto 0;
+    position: relative; z-index: 1;
+  }
+
+  /* ── BUY NOW BOX (top) ── */
+  .buy-top-wrap {
+    max-width: 500px;
+    margin: 36px auto 0;
+    position: relative; z-index: 2;
+  }
+
+  .buy-top-box {
+    background: linear-gradient(145deg, #1a1030, #201040);
+    border: 1px solid rgba(155,109,255,0.5);
+    border-radius: 20px;
+    padding: 28px 32px;
+    position: relative; overflow: hidden;
+  }
+
+  .buy-top-box::before {
+    content: '';
+    position: absolute; top: -1px; left: 10%; right: 10%; height: 2px;
+    background: linear-gradient(90deg, transparent, #FF6BF8, #9B6DFF, transparent);
+  }
+
+  .offer-row {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    margin-bottom: 6px;
+  }
+
+  .old-price {
+    font-size: 16px; color: #888; text-decoration: line-through;
+    font-family: 'Hind Siliguri';
+  }
+
+  .save-pill {
+    background: linear-gradient(135deg, #ff5722, #ff7043);
+    border-radius: 50px; padding: 3px 12px;
+    font-size: 11px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+  }
+
+  .new-price {
+    font-size: 54px; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #ffffff, #d4aaff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 4px;
+  }
+
+  .price-note {
+    font-size: 13px; color: #aaaacc;
+    font-family: 'Hind Siliguri'; margin-bottom: 16px;
+  }
+
+  /* Countdown */
+  .timer-row {
+    display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+  }
+  .t-unit {
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(155,109,255,0.3);
+    border-radius: 8px; padding: 8px 12px; min-width: 56px; text-align: center;
+  }
+  .t-num {
+    display: block; font-size: 24px; font-weight: 900;
+    color: #fff; line-height: 1;
+  }
+  .t-lbl {
+    display: block; font-size: 9px; font-weight: 700; color: #9B6DFF;
+    text-transform: uppercase; letter-spacing: 1px; margin-top: 3px;
+    font-family: 'Inter';
+  }
+
+  .buy-btn {
+    display: block; width: 100%;
+    padding: 17px 20px;
+    background: linear-gradient(135deg, #9B6DFF, #FF6BF8);
+    border: none; border-radius: 14px;
+    font-size: 20px; font-weight: 800; color: #fff;
+    cursor: pointer; text-decoration: none;
+    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 30px rgba(255,107,248,0.45);
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .buy-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 44px rgba(255,107,248,0.65); }
+  .buy-btn:hover::before { opacity: 1; }
+
+  .security-row {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 12px; font-size: 12px; color: #8888aa;
+    font-family: 'Hind Siliguri';
+  }
+
+  /* ── VIDEO ── */
+  .video-section {
+    max-width: 680px; margin: 44px auto 0; padding: 0 20px;
+  }
+
+  .video-label-top {
+    font-size: 13px; color: #aaaacc; text-align: center;
+    font-family: 'Hind Siliguri'; margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+
+  .video-mock {
+    width: 100%; aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #14102e, #2a1550);
+    border-radius: 16px; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; cursor: pointer;
+    box-shadow: 0 24px 70px rgba(155,109,255,0.25);
+  }
+
+  .video-bg-text {
+    position: absolute; font-size: 120px; font-weight: 900;
+    color: rgba(155,109,255,0.08); letter-spacing: -6px;
+    user-select: none;
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, #9B6DFF, #FF6BF8);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 40px rgba(255,107,248,0.55);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 2;
+  }
+  .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 60px rgba(255,107,248,0.8); }
+
+  .vid-badge {
+    position: absolute; top: 14px; right: 14px;
+    background: linear-gradient(135deg, #9B6DFF, #FF6BF8);
+    border-radius: 6px; padding: 5px 12px;
+    font-size: 12px; font-weight: 700; color: #fff; z-index: 2;
+  }
+
+  .vid-bottom {
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; color: rgba(255,255,255,0.5);
+    font-family: 'Hind Siliguri'; white-space: nowrap; z-index: 2;
+  }
+
+  /* ── TRUST STRIP ── */
+  .trust-strip {
+    background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 28px 20px; margin-top: 44px;
+  }
+  .trust-inner {
+    max-width: 860px; margin: 0 auto;
+    display: flex; justify-content: center; gap: 36px; flex-wrap: wrap;
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: #c0c0e0; font-family: 'Hind Siliguri';
+  }
+  .trust-item .icon { font-size: 22px; }
+  .trust-item strong { color: #fff; font-weight: 700; }
+
+  /* ── SECTION ── */
+  .section { padding: 64px 20px; max-width: 900px; margin: 0 auto; }
+
+  .section-title {
+    font-size: clamp(22px, 4vw, 34px); font-weight: 800;
+    text-align: center; margin-bottom: 40px; color: #ffffff;
+  }
+  .section-title span {
+    background: linear-gradient(90deg, #9B6DFF, #FF6BF8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* ── PRODUCT CARD ── */
+  .product-card-big {
+    background: linear-gradient(145deg, #14141f, #1e1a35);
+    border: 1px solid var(--border); border-radius: 20px;
+    padding: 36px; text-align: center; position: relative; overflow: hidden;
+    max-width: 640px; margin: 0 auto 56px;
+  }
+  .product-card-big::before {
+    content: ''; position: absolute; top: -1px; left: 20%; right: 20%; height: 2px;
+    background: linear-gradient(90deg, transparent, #FF6BF8, transparent);
+  }
+  .app-icon {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, #1a0a35, #2d1b50);
+    border-radius: 22px; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px; border: 2px solid rgba(155,109,255,0.3);
+    box-shadow: 0 16px 40px rgba(155,109,255,0.3);
+  }
+  .app-name {
+    font-size: 30px; font-weight: 900;
+    color: #ffffff; margin-bottom: 4px;
+  }
+  .app-version {
+    display: inline-block;
+    background: linear-gradient(135deg, #9B6DFF, #FF6BF8);
+    border-radius: 50px; padding: 4px 14px;
+    font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #fff;
+    margin-bottom: 16px;
+  }
+  .stars { display: flex; align-items: center; justify-content: center; gap: 3px; margin-bottom: 4px; }
+  .star { color: var(--gold); font-size: 18px; }
+  .rating-text { font-size: 13px; color: #aaaacc; margin-bottom: 20px; font-family: 'Hind Siliguri'; }
+  .feature-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .chip {
+    background: rgba(155,109,255,0.12); border: 1px solid rgba(155,109,255,0.35);
+    border-radius: 50px; padding: 5px 14px;
+    font-size: 13px; color: #d4aaff; font-family: 'Hind Siliguri';
+  }
+
+  /* ── FEATURES ── */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;
+  }
+  .feat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 20px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .feat-card::before {
+    content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #9B6DFF, transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .feat-card:hover { border-color: rgba(155,109,255,0.5); transform: translateY(-3px); }
+  .feat-card:hover::before { opacity: 1; }
+  .feat-icon { font-size: 30px; margin-bottom: 12px; }
+  .feat-title { font-size: 15px; font-weight: 700; margin-bottom: 7px; color: #ffffff; }
+  .feat-desc { font-size: 14px; color: #aaaacc; line-height: 1.6; font-family: 'Hind Siliguri'; }
+
+  /* ── INCLUDES ── */
+  .includes-list { max-width: 580px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .include-item {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px;
+  }
+  .include-check {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: linear-gradient(135deg, #9B6DFF, #FF6BF8);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #fff; font-weight: 700;
+  }
+  .include-text { font-size: 15px; font-family: 'Hind Siliguri'; font-weight: 500; color: #e0e0ff; }
+
+  /* ── FAQ ── */
+  .faq-list { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+  .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .faq-q {
+    padding: 16px 20px; font-weight: 600; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Hind Siliguri'; font-size: 15px; color: #e0e0ff;
+    transition: color 0.2s; user-select: none;
+  }
+  .faq-q:hover { color: #d4aaff; }
+  .faq-q .arr { transition: transform 0.2s; font-size: 16px; color: #9B6DFF; }
+  .faq-item.open .faq-q .arr { transform: rotate(180deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 20px; font-size: 14px; color: #aaaacc; line-height: 1.7;
+    font-family: 'Hind Siliguri';
+  }
+  .faq-item.open .faq-a { max-height: 180px; padding: 0 20px 16px; }
+
+  /* ── BOTTOM BUY ── */
+  .bottom-buy {
+    max-width: 500px; margin: 0 auto;
+    background: linear-gradient(145deg, #1a1030, #201045);
+    border: 1px solid rgba(155,109,255,0.45);
+    border-radius: 20px; padding: 40px 36px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .bottom-buy::before {
+    content: ''; position: absolute; top: -1px; left: 10%; right: 10%; height: 2px;
+    background: linear-gradient(90deg, transparent, #9B6DFF, #FF6BF8, transparent);
+  }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 0 20px; }
+
+  /* ── FLOATING CTA ── */
+  .sticky-cta {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 999;
+    background: linear-gradient(135deg, #9B6DFF, #FF6BF8);
+    border: none; border-radius: 50px; padding: 13px 32px;
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 30px rgba(255,107,248,0.5);
+    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: floatUp 0.5s ease 0.8s both;
+    white-space: nowrap;
+  }
+  .sticky-cta:hover { transform: translateX(-50%) translateY(-3px); box-shadow: 0 14px 44px rgba(255,107,248,0.7); }
+  @keyframes floatUp { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+  footer {
+    text-align: center; padding: 36px 20px;
+    font-size: 12px; color: #555577;
+    border-top: 1px solid var(--border);
+    font-family: 'Hind Siliguri';
+  }
+
+  @media(max-width:600px){
+    .trust-inner{gap:20px}
+    .buy-top-box{padding:22px 20px}
+    .new-price{font-size:44px}
+    .bottom-buy{padding:30px 22px}
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO + BUY NOW ON TOP -->
+<section class="hero">
+  <div class="badge"><span class="dot"></span> সীমিত সময়ের অফার — ৭২% ছাড়</div>
+
+  <h1 class="hero-title">
+    <span class="t1">CapCut Pro</span>
+    <span class="t2">Lifetime Access</span>
+  </h1>
+  <p class="hero-sub">একবার কিনুন, সারাজীবন ব্যবহার করুন।<br>প্রিমিয়াম ভিডিও এডিটিং এখন আপনার হাতে।</p>
+
+  <!-- ✅ BUY NOW BOX — VIDEO এর উপরে -->
+  <div class="buy-top-wrap">
+    <div class="buy-top-box">
+      <div class="offer-row">
+        <span class="old-price">৳৩,৫০০</span>
+        <span class="save-pill">🔥 ৭২% OFF</span>
+      </div>
+      <div class="new-price">৳৯৯৯</div>
+      <p class="price-note">একবার পেমেন্ট · সারাজীবন অ্যাক্সেস</p>
+
+      <div class="timer-row">
+        <div class="t-unit"><span class="t-num" id="th">02</span><span class="t-lbl">ঘণ্টা</span></div>
+        <div class="t-unit"><span class="t-num" id="tm">47</span><span class="t-lbl">মিনিট</span></div>
+        <div class="t-unit"><span class="t-num" id="ts">30</span><span class="t-lbl">সেকেন্ড</span></div>
+      </div>
+
+      <a href="YOUR_PAYMENT_LINK_HERE" class="buy-btn" target="_blank">🛒 এখনই কিনুন — ৳৯৯৯</a>
+      <p class="security-row">🔒 SSL নিরাপদ · বিকাশ · নগদ · কার্ড · ৭ দিনের গ্যারান্টি</p>
+    </div>
+  </div>
+
+  <!-- ✅ VIDEO — Buy Now এর নিচে -->
+  <div class="video-section" style="padding:0;width:100%;max-width:680px;margin:32px auto 0;">
+    <p class="video-label-top">👇 প্রোডাক্ট ডেমো দেখুন আগে</p>
+    <div class="video-mock">
+      <span class="video-bg-text">CC</span>
+      <div class="play-btn">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div class="vid-badge">🎬 রিভিউ ভিডিও</div>
+      <div class="vid-bottom">▶ CapCut Pro রিভিউ — ৩ মিনিট</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-inner">
+    <div class="trust-item"><span class="icon">👥</span><div><strong>১২,০০০+</strong><br>সন্তুষ্ট কাস্টমার</div></div>
+    <div class="trust-item"><span class="icon">⚡</span><div><strong>তাৎক্ষণিক</strong><br>ডেলিভারি</div></div>
+    <div class="trust-item"><span class="icon">🔒</span><div><strong>নিরাপদ</strong><br>পেমেন্ট</div></div>
+    <div class="trust-item"><span class="icon">🛡️</span><div><strong>৭ দিনের</strong><br>গ্যারান্টি</div></div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAILS -->
+<div class="section">
+  <h2 class="section-title">পণ্যের <span>বিস্তারিত</span></h2>
+  <div class="product-card-big">
+    <div class="app-icon">✂️</div>
+    <div class="app-name">CapCut Pro</div>
+    <div class="app-version">Premium Edition</div>
+    <div class="stars">
+      <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+    </div>
+    <p class="rating-text">৪.৯/৫ — ২,৮০০+ রিভিউ</p>
+    <div class="feature-chips">
+      <span class="chip">AI এডিটিং</span>
+      <span class="chip">4K সাপোর্ট</span>
+      <span class="chip">টেমপ্লেট লাইব্রেরি</span>
+      <span class="chip">ওয়াটারমার্ক ফ্রি</span>
+      <span class="chip">ক্লাউড স্টোরেজ</span>
+      <span class="chip">মাল্টি-ডিভাইস</span>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="margin-top:0">কেন CapCut Pro <span>কিনবেন?</span></h2>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-icon">🤖</div><div class="feat-title">AI Auto-Edit</div><div class="feat-desc">কৃত্রিম বুদ্ধিমত্তায় স্বয়ংক্রিয়ভাবে ভিডিও এডিট — মাত্র এক ক্লিকে!</div></div>
+    <div class="feat-card"><div class="feat-icon">🎬</div><div class="feat-title">৫০০০+ প্রিমিয়াম টেমপ্লেট</div><div class="feat-desc">রেডিমেড টেমপ্লেট দিয়ে প্রফেশনাল ভিডিও মিনিটেই তৈরি করুন।</div></div>
+    <div class="feat-card"><div class="feat-icon">🚫</div><div class="feat-title">ওয়াটারমার্ক ফ্রি</div><div class="feat-desc">কোনো লোগো ছাড়াই এক্সপোর্ট করুন ৪K কোয়ালিটিতে।</div></div>
+    <div class="feat-card"><div class="feat-icon">☁️</div><div class="feat-title">ক্লাউড ব্যাকআপ</div><div class="feat-desc">সব প্রজেক্ট ক্লাউডে সেভ — যেকোনো ডিভাইস থেকে এক্সেস।</div></div>
+    <div class="feat-card"><div class="feat-icon">🎵</div><div class="feat-title">রয়্যালটি ফ্রি মিউজিক</div><div class="feat-desc">লক্ষাধিক ট্র্যাক — কপিরাইট ছাড়াই ব্যবহার করুন।</div></div>
+    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">মাল্টি-প্ল্যাটফর্ম</div><div class="feat-desc">Android, iOS ও PC — সব জায়গায় একই অ্যাকাউন্ট।</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- WHAT YOU GET -->
+<div class="section">
+  <h2 class="section-title">যা যা <span>পাচ্ছেন</span></h2>
+  <div class="includes-list">
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">CapCut Pro লাইফটাইম লাইসেন্স কী</span></div>
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">৫০০০+ এক্সক্লুসিভ টেমপ্লেট অ্যাক্সেস</span></div>
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">AI ব্যাকগ্রাউন্ড রিমুভার টুল</span></div>
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">১০০ GB ক্লাউড স্টোরেজ (১ বছর)</span></div>
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">২৪/৭ বাংলা কাস্টমার সাপোর্ট</span></div>
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">ইনস্টলেশন গাইড ও ভিডিও টিউটোরিয়াল</span></div>
+    <div class="include-item"><div class="include-check">✓</div><span class="include-text">তাৎক্ষণিক ডিজিটাল ডেলিভারি (৫ মিনিটের মধ্যে)</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FAQ -->
+<div class="section">
+  <h2 class="section-title">সাধারণ <span>প্রশ্নোত্তর</span></h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q">ডেলিভারি কতক্ষণে পাবো? <span class="arr">▾</span></div>
+      <div class="faq-a">পেমেন্ট কনফার্মের ৫ মিনিটের মধ্যে আপনার নম্বরে/ইমেইলে লাইসেন্স কী পাঠানো হবে।</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">কোন ডিভাইসে কাজ করবে? <span class="arr">▾</span></div>
+      <div class="faq-a">Android, iOS, Windows ও Mac — সব প্ল্যাটফর্মে একই অ্যাকাউন্টে ব্যবহার করা যাবে।</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">মানি-ব্যাক গ্যারান্টি কীভাবে কাজ করে? <span class="arr">▾</span></div>
+      <div class="faq-a">পণ্য পেয়ে ৭ দিনের মধ্যে সমস্যা হলে ফুল রিফান্ড পাবেন। আমাদের সাথে যোগাযোগ করুন।</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">পেমেন্ট কীভাবে করবো? <span class="arr">▾</span></div>
+      <div class="faq-a">bKash, Nagad, Rocket এবং কার্ড পেমেন্ট গ্রহণ করা হয়।</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- BOTTOM BUY -->
+<div class="section" style="padding-top:48px;padding-bottom:80px">
+  <h2 class="section-title">আর দেরি না, <span>এখনই নিন!</span></h2>
+  <div class="bottom-buy">
+    <div class="offer-row" style="margin-bottom:6px">
+      <span class="old-price">৳৩,৫০০</span>
+      <span class="save-pill">🔥 ৭২% OFF</span>
+    </div>
+    <div class="new-price">৳৯৯৯</div>
+    <p class="price-note" style="margin-bottom:20px">একবার পেমেন্ট · সারাজীবন অ্যাক্সেস</p>
+    <a href="YOUR_PAYMENT_LINK_HERE" class="buy-btn" target="_blank">🛒 এখনই কিনুন — ৳৯৯৯</a>
+    <p class="security-row" style="margin-top:14px">🔒 SSL নিরাপদ · বিকাশ · নগদ · ৭ দিনের গ্যারান্টি</p>
+  </div>
+</div>
+
+<footer>
+  © 2026 EduAlimun Digital Store · সকল অধিকার সংরক্ষিত<br>
+  <span style="opacity:0.5">এটি একটি ডিজিটাল পণ্য। ডেলিভারি সম্পূর্ণ অনলাইনে হবে।</span>
+</footer>
+
+<!-- FLOATING CTA -->
+<a href="YOUR_PAYMENT_LINK_HERE" class="sticky-cta" target="_blank">
+  🛒 কিনুন — মাত্র ৳৯৯৯
+</a>
+
+<script>
+  let total = 2*3600 + 47*60 + 30;
+  const th=document.getElementById('th'), tm=document.getElementById('tm'), ts=document.getElementById('ts');
+  setInterval(()=>{
+    if(total<=0)return; total--;
+    th.textContent=String(Math.floor(total/3600)).padStart(2,'0');
+    tm.textContent=String(Math.floor((total%3600)/60)).padStart(2,'0');
+    ts.textContent=String(total%60).padStart(2,'0');
+  },1000);
+
+  document.querySelectorAll('.faq-q').forEach(q=>{
+    q.addEventListener('click',()=>{
+      const item=q.parentElement, isOpen=item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+      if(!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+</body>
+</html>
