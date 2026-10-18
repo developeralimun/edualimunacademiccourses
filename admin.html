@@ -1,101 +1,186 @@
 <!DOCTYPE html>
-<html lang="bn"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="robots" content="noindex"/><title>পোস্ট ম্যানেজমেন্ট — alimixstore</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
+<html lang="bn"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/><title>Admin — alimixstore</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{font-family:'Hind Siliguri',sans-serif}body{background:#0F172A;color:#F1F5F9}
-.g{background:rgba(30,41,59,.7);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:1rem}
-.in{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:.6rem;padding:.55rem .8rem;font-size:.85rem;width:100%;color:#F1F5F9}
-.in option{background:#0F172A}.b{background:linear-gradient(135deg,#0D9488,#10B981);border-radius:999px;padding:.4rem 1rem;font-size:.75rem;font-weight:600}
-.r{background:#b91c1c;border-radius:999px;padding:.4rem 1rem;font-size:.75rem;font-weight:600}.n{background:rgba(255,255,255,.1);border-radius:999px;padding:.4rem 1rem;font-size:.75rem}
-</style></head>
-<body class="p-4 max-w-5xl mx-auto">
-<div class="flex items-center justify-between mb-5"><h1 class="text-xl font-bold">📝 পোস্ট ও প্যাকেজ ম্যানেজমেন্ট</h1><a href="admin.html" class="n">← মূল অ্যাডমিন</a></div>
-<p id="gate" class="g text-sm">লগইন চেক হচ্ছে... লগইন না থাকলে আগে <a href="admin.html" class="underline text-teal-300">admin.html</a>-এ লগইন করুন (একই ডোমেইনে থাকতে হবে)।</p>
+:root{--bg:#08182b;--line:#29465d;--g:#25d6a0;--mut:#a8bdce;--tx:#eff8ff;--red:#ff6878}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top left,#12413c,transparent 36%),var(--bg);color:var(--tx);font-family:'Hind Siliguri',sans-serif}
+.wrap{max-width:1050px;margin:24px auto;padding:0 14px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.brand{font-size:24px;font-weight:700}.brand span{color:var(--g)}.mut{color:var(--mut);font-size:13px}
+.g{background:linear-gradient(145deg,#112b43,#0d2238);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);background:#102840;color:var(--mut);padding:9px 14px;border-radius:9px;cursor:pointer;font:inherit}
+.tab.on{background:var(--g);color:#06251c;font-weight:700}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}label.ck{display:flex;gap:8px;align-items:center}
+input,textarea,select{width:100%;padding:10px 12px;border:1px solid #36556d;border-radius:9px;background:#071a2d;color:var(--tx);font:inherit;font-size:14px}
+input[type=checkbox]{width:auto}textarea{min-height:70px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.fg .w{grid-column:1/-1}
+.r{display:flex;gap:8px;flex-wrap:wrap}.b,.n,.d{border:0;border-radius:9px;padding:9px 16px;font:600 13px inherit;cursor:pointer}
+.b{background:linear-gradient(120deg,var(--g),#79efc7);color:#05251d}.n{background:#17354d;color:var(--tx);border:1px solid var(--line)}.d{background:#692b3a;color:#fff}
+.it{border:1px solid var(--line);border-radius:10px;padding:11px 13px;display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;background:#0a2036}
+.it small{color:var(--mut);display:block}.hid{display:none!important}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}.stat div{background:#0a2036;border:1px solid var(--line);border-radius:12px;padding:12px}.stat b{display:block;font-size:20px;color:var(--g)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#132e43;border:1px solid var(--g);padding:10px 20px;border-radius:99px;font-size:14px;z-index:9}
+@media(max-width:600px){.fg{grid-template-columns:1fr}.it{flex-direction:column;align-items:flex-start}}
+</style></head><body><div class="wrap">
 
-<div id="app" class="hidden grid md:grid-cols-2 gap-4">
- <section class="g">
-  <h2 class="font-bold mb-3">১. পোস্ট (হোমের কার্ড)</h2>
-  <input type="hidden" id="pId"/>
-  <input id="pTitle" class="in mb-2" placeholder="টাইটেল (যেমনঃ TikTok Coin)"/>
-  <textarea id="pDesc" rows="2" class="in mb-2" placeholder="ছোট বিবরণ"></textarea>
-  <div class="grid grid-cols-2 gap-2 mb-2">
-   <select id="pSection" class="in"><option value="purchase">সেকশন: Digital Purchase</option></select>
-   <input id="pOrder" type="number" class="in" placeholder="ক্রম (১,২,৩...)"/>
-   <input id="pBadge" class="in" placeholder="ব্যাজ (Hot/New) ঐচ্ছিক"/>
-   <select id="pAcc" class="in"><option value="tiktok">অ্যাকাউন্ট: TikTok</option><option value="facebook">অ্যাকাউন্ট: Facebook</option></select>
-  </div>
-  <input id="pAccLabel" class="in mb-2" placeholder="গ্রাহকের ইনপুট লেবেল (যেমনঃ TikTok Username@ / Facebook পোস্ট লিংক)"/>
-  <input id="pImage" class="in mb-2" placeholder="ছবির লিংক (হোম কার্ড ও প্যাকেজ পেজের উপরে দেখাবে) — ঐচ্ছিক"/>
-  <select id="pSource" class="in mb-2"><option value="packages">প্যাকেজ: নতুন সিস্টেম (এখান থেকে যোগ করুন)</option><option value="coinPackages">প্যাকেজ: আগের TikTok Coin ডেটা</option><option value="starPackages">প্যাকেজ: আগের Facebook Star ডেটা</option></select>
-  <select id="pIcon" class="in mb-2"><option value="coin">প্যাকেজ আইকন: কয়েন 🪙</option><option value="star">প্যাকেজ আইকন: স্টার ⭐</option><option value="none">প্যাকেজ আইকন: কিছু না</option></select>
-  <label class="text-xs flex items-center gap-2 mb-3"><input type="checkbox" id="pActive" checked/> হোমে দেখাবে</label>
-  <div class="flex gap-2"><button id="pSave" class="b">সংরক্ষণ</button><button id="pReset" class="n">নতুন</button></div>
-  <div id="postList" class="mt-4 space-y-2"></div>
- </section>
-
- <section class="g">
-  <h2 class="font-bold mb-1">২. প্যাকেজ (দাম, ছাড়, কুপন)</h2>
-  <select id="selPost" class="in mb-3"></select>
-  <p id="legacyNote" class="hidden text-[11px] text-amber-300 mb-3">এই পোস্টে আগের ডেটা ব্যবহার হচ্ছে — সেগুলো মূল admin.html-এর কয়েন/স্টার ট্যাব থেকে এডিট করুন। এখানে নতুন সিস্টেমের পোস্টের প্যাকেজ যোগ হয়।</p>
-  <div id="pkgForm">
-   <input type="hidden" id="kId"/>
-   <input id="kLabel" class="in mb-2" placeholder="প্যাকেজ নাম (যেমনঃ 700 Coins / 1000 Likes)"/>
-   <div class="grid grid-cols-3 gap-2 mb-2">
-    <input id="kPrice" type="number" class="in" placeholder="মূল্য ৳"/><input id="kOld" type="number" class="in" placeholder="আগের মূল্য ৳ (ছাড় দেখাতে)"/><input id="kOrder" type="number" class="in" placeholder="ক্রম"/></div>
-   <div class="grid grid-cols-2 gap-2 mb-3"><input id="kCode" class="in" placeholder="কুপন কোড" style="text-transform:uppercase"/><input id="kDisc" type="number" class="in" placeholder="কুপন ছাড় ৳"/></div>
-   <div class="flex gap-2"><button id="kSave" class="b">প্যাকেজ সংরক্ষণ</button><button id="kReset" class="n">নতুন</button></div>
-  </div>
-  <div id="pkgList" class="mt-4 space-y-2"></div>
- </section>
+<div id="login" class="g" style="max-width:400px;margin:10vh auto">
+ <h2>🔐 Admin Login</h2>
+ <form id="lf"><label>ইমেইল</label><input id="em" type="email" required style="margin-bottom:10px"><label>পাসওয়ার্ড</label><input id="pw" type="password" required style="margin-bottom:12px">
+ <p id="le" class="hid" style="color:var(--red);font-size:13px"></p><button class="b" style="width:100%">লগইন</button></form>
 </div>
+
+<div id="app" class="hid">
+ <div class="top"><div><div class="brand">alimix<span>store</span> Admin</div><div class="mut" id="who"></div></div>
+  <div class="r"><a class="n" href="index.html" target="_blank" style="text-decoration:none">সাইট দেখুন</a><button class="d" id="out">লগআউট</button></div></div>
+ <div class="tabs" id="tabs">
+  <button class="tab on" data-t="orders">🧾 অর্ডার</button><button class="tab" data-t="posts">📝 পোস্ট</button><button class="tab" data-t="pkgs">📦 প্যাকেজ</button>
+  <button class="tab" data-t="prods">🛍️ ডিজিটাল প্রোডাক্ট</button><button class="tab" data-t="report">📊 কুপন রিপোর্ট</button><button class="tab" data-t="set">⚙️ সেটিংস</button></div>
+
+ <section id="t-orders" class="tp">
+  <div class="stat"><div>মোট অর্ডার<b id="sO">0</b></div><div>পেন্ডিং<b id="sP">0</b></div><div>পোস্ট<b id="sPo">0</b></div><div>প্যাকেজ<b id="sPk">0</b></div></div>
+  <div class="g"><select id="of" style="max-width:200px"><option value="">সব স্ট্যাটাস</option><option value="pending">পেন্ডিং</option><option value="verified">যাচাইকৃত</option><option value="completed">সম্পন্ন</option><option value="rejected">বাতিল</option></select></div>
+  <div id="oL"></div></section>
+ <section id="t-posts" class="tp hid"></section>
+ <section id="t-pkgs" class="tp hid"></section>
+ <section id="t-prods" class="tp hid"></section>
+ <section id="t-report" class="tp hid">
+  <div class="g r" style="align-items:end"><div><label>সময়</label><select id="rp"><option value="week">এই সপ্তাহ</option><option value="month" selected>এই মাস</option><option value="all">সব সময়</option></select></div><button class="b" id="csv">⬇️ Excel/CSV ডাউনলোড</button></div>
+  <div class="stat"><div>কুপন অর্ডার<b id="rC">0</b></div><div>মোট ছাড় (ক্ষতি)<b id="rD" style="color:var(--red)">৳0</b></div><div>মোট আদায়<b id="rF">৳0</b></div></div>
+  <div class="g" style="overflow-x:auto"><table><thead><tr><th>তারিখ</th><th>কুপন</th><th>গ্রাহক</th><th>প্যাকেজ</th><th>আসল</th><th>ছাড়</th><th>প্রদত্ত</th></tr></thead><tbody id="rB"></tbody></table></div></section>
+ <section id="t-set" class="tp hid"><div class="g"><div class="fg" id="setF"></div><button class="b" id="setS">সংরক্ষণ করুন</button></div></section>
+</div></div>
+<div id="toast" class="toast hid"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,setDoc,onSnapshot,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAa8YiG1P7rZoCg-enQ0E2HflfDY7JFPyQ",authDomain:"alimixstoretopup.firebaseapp.com",projectId:"alimixstoretopup",storageBucket:"alimixstoretopup.firebasestorage.app",messagingSenderId:"102854684850",appId:"1:102854684850:web:c11f6ee301a29ffdc7d9ab"});
-const db=getFirestore(app);const $=id=>document.getElementById(id);
+const auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let POSTS=[],PKGS=[],started=false;
-onAuthStateChanged(getAuth(app),u=>{if(!u)return;$('gate').classList.add('hidden');$('app').classList.remove('hidden');if(started)return;started=true;
- onSnapshot(collection(db,'posts'),s=>{POSTS=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));drawPosts()});
- onSnapshot(collection(db,'packages'),s=>{PKGS=s.docs.map(d=>({id:d.id,...d.data()}));drawPkgs()})});
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hid');setTimeout(()=>t.classList.add('hid'),2000)};
+const S={posts:[],packages:[],products:[],orders:[]};const redraw=[];
 
-function drawPosts(){
- const keep=$('selPost').value;
- $('selPost').innerHTML=POSTS.map(p=>`<option value="${p.id}">${esc(p.title)}</option>`).join('');if(keep)$('selPost').value=keep;
- $('postList').innerHTML=POSTS.map(p=>`<div class="flex items-center justify-between gap-2 bg-white/5 rounded-xl px-3 py-2"><span class="text-sm truncate">${p.active===false?'🚫 ':''}${esc(p.title)} <span class="text-[10px] text-slate-400">${esc(p.section)}</span></span><span class="flex gap-1 shrink-0"><button class="n" data-e="${p.id}">এডিট</button><button class="r" data-d="${p.id}">ডিলিট</button></span></div>`).join('');
- drawPkgs();
-}
-$('postList').addEventListener('click',async e=>{
- const id=e.target.dataset.e||e.target.dataset.d;if(!id)return;const p=POSTS.find(x=>x.id===id);
- if(e.target.dataset.d){if(confirm('পোস্টটি মুছে ফেলবেন? (প্যাকেজগুলো আলাদা থেকে যাবে)'))await deleteDoc(doc(db,'posts',id));return}
- $('pId').value=id;$('pTitle').value=p.title||'';$('pDesc').value=p.desc||'';$('pSection').value=p.section||'topup';$('pOrder').value=p.order||'';$('pBadge').value=p.badge||'';
- $('pAcc').value=p.accountType||'tiktok';$('pAccLabel').value=p.accountLabel||'';$('pImage').value=p.image||'';$('pSource').value=p.source||'packages';$('pIcon').value=p.icon||'coin';$('pActive').checked=p.active!==false;scrollTo(0,0)});
-$('pReset').onclick=()=>{['pId','pTitle','pDesc','pOrder','pBadge','pAccLabel','pImage'].forEach(i=>$(i).value='');$('pActive').checked=true};
-$('pSave').onclick=async()=>{
- const t=$('pTitle').value.trim();if(!t)return alert('টাইটেল দিন');
- const d={title:t,desc:$('pDesc').value.trim(),section:$('pSection').value,order:+$('pOrder').value||Date.now(),badge:$('pBadge').value.trim(),accountType:$('pAcc').value,accountLabel:$('pAccLabel').value.trim()||'অ্যাকাউন্ট / লিংক *',image:$('pImage').value.trim(),source:$('pSource').value,icon:$('pIcon').value,active:$('pActive').checked};
- const id=$('pId').value;id?await updateDoc(doc(db,'posts',id),d):await addDoc(collection(db,'posts'),d);$('pReset').click()};
+/* ---------- Auth ---------- */
+$('lf').onsubmit=async e=>{e.preventDefault();$('le').classList.add('hid');
+ try{await signInWithEmailAndPassword(auth,$('em').value,$('pw').value)}catch{$('le').textContent='লগইন ব্যর্থ। ইমেইল/পাসওয়ার্ড দেখুন।';$('le').classList.remove('hid')}};
+$('out').onclick=()=>signOut(auth);
+let started=false;
+onAuthStateChanged(auth,u=>{$('login').classList.toggle('hid',!!u);$('app').classList.toggle('hid',!u);if(!u||started)return;started=true;$('who').textContent=u.email;start()});
 
-function curPost(){return POSTS.find(p=>p.id===$('selPost').value)}
-function drawPkgs(){
- const p=curPost(),legacy=p&&(p.source||'packages')!=='packages';
- $('legacyNote').classList.toggle('hidden',!legacy);$('pkgForm').classList.toggle('hidden',!!legacy||!p);
- const l=legacy||!p?[]:PKGS.filter(k=>k.postId===p.id).sort((a,b)=>(a.order||0)-(b.order||0));
- $('pkgList').innerHTML=l.map(k=>`<div class="flex items-center justify-between gap-2 bg-white/5 rounded-xl px-3 py-2"><span class="text-sm">${esc(k.label)} · ৳${k.price}${k.oldPrice?` <s class="text-slate-500">৳${k.oldPrice}</s>`:''}${k.couponCode?` <span class="text-[11px] text-teal-300">🎟️ ${esc(k.couponCode)} -৳${k.couponDiscount||0}</span>`:''}</span><span class="flex gap-1 shrink-0"><button class="n" data-e="${k.id}">এডিট</button><button class="r" data-d="${k.id}">ডিলিট</button></span></div>`).join('');
+/* ---------- Tabs ---------- */
+$('tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));
+ document.querySelectorAll('.tp').forEach(x=>x.classList.toggle('hid',x.id!=='t-'+b.dataset.t))};
+
+/* ---------- Generic CRUD builder ---------- */
+function crud(root,col,title,fields,label,o={}){
+ const el=$(root);let eid='';const id=k=>root+'_'+k;
+ const inp=f=>f.t==='area'?`<textarea id="${id(f.k)}" placeholder="${f.p||''}"></textarea>`
+  :f.t==='sel'?`<select id="${id(f.k)}"></select>`
+  :f.t==='check'?`<input type="checkbox" id="${id(f.k)}">`
+  :`<input id="${id(f.k)}" type="${f.t||'text'}" placeholder="${f.p||''}">`;
+ el.innerHTML=`<div class="g"><h3 id="${id('h')}" style="margin-top:0"></h3><div class="fg">${fields.map(f=>`<div class="${f.w?'w':''}"><label ${f.t==='check'?'class="ck"':''}>${f.t==='check'?inp(f)+f.l:f.l+'</label>'+inp(f)}${f.t==='check'?'</label>':''}</div>`).join('')}</div>
+  <div class="r"><button class="b" id="${id('s')}">সংরক্ষণ</button><button class="n" id="${id('n')}">নতুন / ক্লিয়ার</button></div></div><div id="${id('l')}"></div>`;
+ const reset=()=>{eid='';$(id('h')).textContent='➕ নতুন '+title;fields.forEach(f=>{const x=$(id(f.k));
+  if(f.t==='check')x.checked=f.d!==false;else if(f.t!=='sel')x.value=f.d??''});fillSel()};
+ const fillSel=()=>fields.filter(f=>f.t==='sel').forEach(f=>{const x=$(id(f.k)),keep=x.value;
+  x.innerHTML=(typeof f.o==='function'?f.o():f.o).map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');if(keep)x.value=keep});
+ const draw=()=>{fillSel();const l=[...S[col]].sort(o.sort||((a,b)=>(a.order||0)-(b.order||0)));
+  $(id('l')).innerHTML=l.map(x=>`<div class="it"><div>${label(x)}</div><div class="r"><button class="n" data-e="${x.id}">এডিট</button><button class="d" data-d="${x.id}">ডিলিট</button></div></div>`).join('')||'<p class="mut">কিছু নেই।</p>'};
+ $(id('l')).onclick=async e=>{const b=e.target;
+  if(b.dataset.d){if(confirm('মুছে ফেলবেন?')){await deleteDoc(doc(db,col,b.dataset.d));toast('মুছে ফেলা হয়েছে ✓')}return}
+  if(b.dataset.e){const x=S[col].find(y=>y.id===b.dataset.e);eid=x.id;$(id('h')).textContent='✏️ এডিট: '+title;
+   fields.forEach(f=>{const i=$(id(f.k));if(f.t==='check')i.checked=x[f.k]!==false;else i.value=x[f.k]??f.d??''});scrollTo(0,0)}};
+ $(id('n')).onclick=reset;
+ $(id('s')).onclick=async()=>{const d={};
+  for(const f of fields){const v=$(id(f.k));let val=f.t==='check'?v.checked:v.value.trim();
+   if(f.t==='number')val=+val||0;if(f.up)val=String(val).toUpperCase();
+   if(f.req&&!val)return alert(f.l+' দিন');d[f.k]=val}
+  if(o.fix)o.fix(d);
+  try{if(eid)await updateDoc(doc(db,col,eid),d);else await addDoc(collection(db,col),{...d,...(o.add||{})});toast('সংরক্ষণ হয়েছে ✓');reset()}catch(e){alert('ব্যর্থ: '+e.message)}};
+ reset();redraw.push(draw);draw();
 }
-$('selPost').onchange=drawPkgs;
-$('pkgList').addEventListener('click',async e=>{
- const id=e.target.dataset.e||e.target.dataset.d;if(!id)return;const k=PKGS.find(x=>x.id===id);
- if(e.target.dataset.d){if(confirm('প্যাকেজটি মুছবেন?'))await deleteDoc(doc(db,'packages',id));return}
- $('kId').value=id;$('kLabel').value=k.label||'';$('kPrice').value=k.price||'';$('kOld').value=k.oldPrice||'';$('kOrder').value=k.order||'';$('kCode').value=k.couponCode||'';$('kDisc').value=k.couponDiscount||''});
-$('kReset').onclick=()=>['kId','kLabel','kPrice','kOld','kOrder','kCode','kDisc'].forEach(i=>$(i).value='');
-$('kSave').onclick=async()=>{
- const p=curPost();if(!p)return alert('আগে পোস্ট বানান');const label=$('kLabel').value.trim(),price=+$('kPrice').value;
- if(!label||!price)return alert('নাম ও মূল্য দিন');const code=$('kCode').value.trim().toUpperCase();
- const d={postId:p.id,label,price,oldPrice:+$('kOld').value||0,order:+$('kOrder').value||price,couponCode:code,couponDiscount:code?(+$('kDisc').value||0):0};
- const id=$('kId').value;id?await updateDoc(doc(db,'packages',id),d):await addDoc(collection(db,'packages'),d);$('kReset').click()};
+const postOpts=()=>S.posts.map(p=>[p.id,p.title]);
+
+crud('t-posts','posts','পোস্ট (হোম কার্ড)',[
+ {k:'title',l:'টাইটেল *',req:1,w:1,p:'যেমনঃ TikTok Coin'},
+ {k:'desc',l:'ছোট বিবরণ',t:'area',w:1},
+ {k:'order',l:'ক্রম',t:'number',p:'1,2,3...'},{k:'badge',l:'ব্যাজ (Hot/New)'},
+ {k:'accountType',l:'অ্যাকাউন্ট টাইপ',t:'sel',o:[['tiktok','TikTok'],['facebook','Facebook'],['other','Other']]},
+ {k:'icon',l:'প্যাকেজ আইকন',t:'sel',o:[['coin','🪙 কয়েন'],['star','⭐ স্টার'],['none','কিছু না']]},
+ {k:'accountLabel',l:'গ্রাহকের ইনপুট লেবেল',w:1,p:'যেমনঃ TikTok Username@ *'},
+ {k:'image',l:'ছবির লিংক (ঐচ্ছিক)',w:1},
+ {k:'source',l:'প্যাকেজের উৎস',t:'sel',o:[['packages','নতুন সিস্টেম'],['coinPackages','আগের TikTok Coin ডেটা'],['starPackages','আগের Facebook Star ডেটা']]},
+ {k:'active',l:'হোমে দেখাবে',t:'check'}],
+ p=>`<b>${p.active===false?'🚫 ':''}${esc(p.title)}</b><small>${esc(p.accountType||'')} · ক্রম ${p.order||'-'} · ${esc(p.source||'packages')}</small>`,
+ {fix:d=>{if(!d.order)d.order=Date.now()}});
+
+crud('t-pkgs','packages','প্যাকেজ',[
+ {k:'postId',l:'কোন পোস্টের প্যাকেজ *',t:'sel',o:postOpts,req:1,w:1},
+ {k:'label',l:'প্যাকেজ নাম *',req:1,w:1,p:'যেমনঃ 700 Coins'},
+ {k:'price',l:'মূল্য ৳ *',t:'number',req:1},{k:'oldPrice',l:'আগের মূল্য ৳ (ছাড় দেখাতে)',t:'number'},
+ {k:'order',l:'ক্রম',t:'number'},{k:'couponCode',l:'কুপন কোড',up:1},{k:'couponDiscount',l:'কুপন ছাড় ৳',t:'number'}],
+ k=>{const p=S.posts.find(x=>x.id===k.postId);return `<b>${esc(k.label)} · ৳${k.price}</b>${k.oldPrice?` <s class="mut">৳${k.oldPrice}</s>`:''}<small>${esc(p?p.title:'(পোস্ট নেই)')}${k.couponCode?` · 🎟️ ${esc(k.couponCode)} -৳${k.couponDiscount||0}`:''}</small>`},
+ {sort:(a,b)=>(a.postId||'').localeCompare(b.postId||'')||(a.order||0)-(b.order||0),
+  fix:d=>{if(!d.order)d.order=d.price;if(!d.couponCode)d.couponDiscount=0}});
+
+crud('t-prods','products','ডিজিটাল প্রোডাক্ট',[
+ {k:'name',l:'নাম *',req:1,w:1},{k:'category',l:'ক্যাটাগরি',p:'Boost, Topup...'},{k:'badge',l:'ব্যাজ'},
+ {k:'description',l:'বিবরণ',t:'area',w:1},{k:'image',l:'ছবির লিংক',w:1},
+ {k:'originalPrice',l:'মূল মূল্য ৳',t:'number'},{k:'offerPrice',l:'অফার মূল্য ৳ *',t:'number',req:1},
+ {k:'discountPercent',l:'ছাড় % (খালি = অটো)',t:'number'},{k:'productLink',l:'প্রোডাক্ট লিংক'},
+ {k:'couponCode',l:'কুপন কোড',up:1},{k:'couponDiscount',l:'কুপন ছাড় ৳',t:'number'},
+ {k:'pinned',l:'📌 পিন করুন',t:'check',d:false},{k:'featured',l:'ফিচার্ড',t:'check',d:false}],
+ p=>`<b>${p.pinned?'📌 ':''}${esc(p.name)}</b><small>${esc(p.category||'')} · ৳${p.offerPrice||0}${p.couponCode?' · 🎟️ '+esc(p.couponCode):''}</small>`,
+ {sort:(a,b)=>0,add:{createdAt:serverTimestamp()},
+  fix:d=>{if(!d.discountPercent&&d.originalPrice>d.offerPrice)d.discountPercent=Math.round((d.originalPrice-d.offerPrice)/d.originalPrice*100);if(!d.couponCode)d.couponDiscount=0}});
+
+/* ---------- Orders ---------- */
+const SL={pending:'পেন্ডিং',verified:'যাচাইকৃত',completed:'সম্পন্ন',rejected:'বাতিল'};
+function drawOrders(){
+ const f=$('of').value,l=S.orders.filter(o=>!f||o.status===f);
+ $('sO').textContent=S.orders.length;$('sP').textContent=S.orders.filter(o=>o.status==='pending').length;$('sPo').textContent=S.posts.length;$('sPk').textContent=S.packages.length;
+ $('oL').innerHTML=l.map(o=>`<div class="g"><div class="r" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+  <div><b>${esc(o.productName)}</b> <span style="color:var(--g)">৳${o.offerPrice||0}</span>${o.couponApplied?' 🎟️'+esc(o.couponCode):''}<div class="mut">ID: ${o.id.slice(0,8).toUpperCase()}</div></div>
+  <select data-s="${o.id}" style="width:auto">${Object.entries(SL).map(([v,t])=>`<option value="${v}" ${o.status===v?'selected':''}>${t}</option>`).join('')}</select></div>
+  <div class="mut" style="line-height:1.8">👤 ${esc(o.customerName)} · 📞 ${esc(o.customerPhone)}<br>অ্যাকাউন্ট: ${esc(o.accountIdentifier)}<br>${esc((o.paymentMethod||'').toUpperCase())} ${esc(o.paymentNumber)} · Txn: ${esc(o.transactionId)}</div>
+  <button class="d" data-od="${o.id}" style="margin-top:8px">ডিলিট</button></div>`).join('')||'<p class="mut">কোনো অর্ডার নেই।</p>';
+}
+$('of').onchange=drawOrders;
+$('oL').onchange=async e=>{if(e.target.dataset.s){await updateDoc(doc(db,'orders',e.target.dataset.s),{status:e.target.value});toast('স্ট্যাটাস আপডেট ✓')}};
+$('oL').onclick=async e=>{const i=e.target.dataset.od;if(i&&confirm('অর্ডার মুছবেন?'))await deleteDoc(doc(db,'orders',i))};
+redraw.push(drawOrders);
+
+/* ---------- Coupon report ---------- */
+const dt=o=>o.createdAt&&o.createdAt.toDate?o.createdAt.toDate():null;
+let RL=[];
+function drawReport(){
+ const now=new Date(),p=$('rp').value;let st=null;
+ if(p==='week'){st=new Date(now);st.setDate(now.getDate()-now.getDay());st.setHours(0,0,0,0)}
+ if(p==='month')st=new Date(now.getFullYear(),now.getMonth(),1);
+ RL=S.orders.filter(o=>o.couponApplied&&(!st||(dt(o)&&dt(o)>=st)));
+ const sum=k=>RL.reduce((a,o)=>a+(k(o)||0),0);
+ $('rC').textContent=RL.length;$('rD').textContent='৳'+sum(o=>o.couponDiscount);$('rF').textContent='৳'+sum(o=>o.offerPrice);
+ $('rB').innerHTML=RL.map(o=>`<tr><td>${dt(o)?dt(o).toLocaleString('bn-BD'):'—'}</td><td>${esc(o.couponCode)}</td><td>${esc(o.customerName)}</td><td>${esc(o.productName)}</td><td>৳${o.originalPrice||0}</td><td>-৳${o.couponDiscount||0}</td><td>৳${o.offerPrice||0}</td></tr>`).join('');
+}
+$('rp').onchange=drawReport;redraw.push(drawReport);
+$('csv').onclick=()=>{if(!RL.length)return toast('কোনো কুপন অর্ডার নেই');
+ const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const rows=[['তারিখ','কুপন','গ্রাহক','ফোন','প্যাকেজ','আসল','ছাড়','প্রদত্ত','Txn','স্ট্যাটাস'],...RL.map(o=>[dt(o)?dt(o).toLocaleString('bn-BD'):'',o.couponCode,o.customerName,o.customerPhone,o.productName,o.originalPrice,o.couponDiscount,o.offerPrice,o.transactionId,o.status])];
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'}));
+ a.download='coupon-report-'+new Date().toISOString().slice(0,10)+'.csv';a.click()};
+
+/* ---------- Settings ---------- */
+const SF=[['bkashNumber','bKash নাম্বার'],['nagadNumber','Nagad নাম্বার'],['rocketNumber','Rocket নাম্বার'],['whatsappNumber','WhatsApp নাম্বার (8801XXXXXXXXX)'],
+ ['bkashRule','bKash নিয়মাবলী','a'],['nagadRule','Nagad নিয়মাবলী','a'],['rocketRule','Rocket নিয়মাবলী','a'],['telegramBotToken','Telegram Bot Token'],['telegramChatId','Telegram Chat ID']];
+$('setF').innerHTML=SF.map(([k,l,a])=>`<div class="${a?'w':''}"><label>${l}</label>${a?`<textarea id="c_${k}"></textarea>`:`<input id="c_${k}">`}</div>`).join('');
+$('setS').onclick=async()=>{const d={};SF.forEach(([k])=>d[k]=$('c_'+k).value.trim());await setDoc(doc(db,'settings','storeConfig'),d,{merge:true});toast('সেটিংস সংরক্ষণ হয়েছে ✓')};
+
+function start(){
+ ['posts','packages','products','orders'].forEach(c=>onSnapshot(collection(db,c),s=>{S[c]=s.docs.map(d=>({id:d.id,...d.data()}));
+  if(c==='orders')S[c].sort((a,b)=>(dt(b)||0)-(dt(a)||0));redraw.forEach(f=>f())},e=>console.error(c,e)));
+ onSnapshot(doc(db,'settings','storeConfig'),s=>{const d=s.exists()?s.data():{};SF.forEach(([k])=>{if(document.activeElement!==$('c_'+k))$('c_'+k).value=d[k]||''})});
+}
 </script></body></html>
