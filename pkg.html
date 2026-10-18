@@ -10,6 +10,12 @@
 .in{width:100%;background:#F8FAFC;border:1px solid #dbe4ee;border-radius:.75rem;padding:.7rem 1rem;font-size:.875rem;margin-bottom:.75rem}.in:focus{outline:none;border-color:#14b8a6}
 .pkg{border:1.5px solid #fca5a5;border-radius:14px;background:#fff;padding:14px 6px;text-align:center;box-shadow:0 3px 7px rgba(15,23,42,.1);transition:.2s}
 .pkg:hover{transform:translateY(-2px);border-color:#ef4444}
+.pkg.star{border-color:#93c5fd}.pkg.star:hover{border-color:#1877F2}.pkg.star .pill{background:linear-gradient(135deg,#3b8bff,#0b57c9)}
+.pk-icon{width:40px;height:40px;margin:0 auto 4px}.pk-icon svg{width:100%;height:100%}
+#wrap{position:relative}#wrap.collapsed .pkg:nth-child(n+7){display:none}
+#wrap .fade{display:none;position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.85) 55%,#fff);pointer-events:none}
+#more{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);padding:8px 20px;border-radius:9999px;border:1.5px solid #fca5a5;background:#fff;color:#dc2626;font-size:14px;font-weight:700;box-shadow:0 6px 16px -6px rgba(15,23,42,.28)}
+#wrap.collapsed .fade{display:block}#wrap.collapsed #more{display:inline-block}
 .pill{display:inline-block;margin-top:6px;padding:3px 14px;border-radius:999px;font-size:14px;font-weight:900;color:#fff;background:linear-gradient(135deg,#ef233c,#b91c1c)}
 </style></head>
 <body>
@@ -18,12 +24,17 @@
 
 <main class="max-w-3xl mx-auto px-4 py-6">
  <p id="nf" class="hidden text-center py-16">পোস্টটি খুঁজে পাওয়া যায়নি।</p>
- <div id="view" class="hidden">
-  <h1 id="title" class="text-2xl font-extrabold mb-1"></h1>
-  <p id="desc" class="text-sm text-slate-500 mb-4"></p>
-  <p class="text-xs text-red-500 font-semibold bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-5">অর্ডারের পর স্ক্রিনশট টেলিগ্রাম/হোয়াটসঅ্যাপে দিন, তারপর অর্ডার কনফার্ম হবে।</p>
-  <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+ <div id="view" class="hidden card rounded-3xl overflow-hidden shadow-sm">
+  <div class="flex items-center gap-4 p-5 sm:p-6" style="background:linear-gradient(135deg,#0F172A,#1e3a5f)">
+   <div id="hImg" class="hidden w-16 h-16 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 bg-white"><img id="hImgTag" alt="" class="w-full h-full object-cover"></div>
+   <div><h1 id="title" class="text-lg sm:text-2xl font-bold text-white"></h1><p id="desc" class="text-xs sm:text-sm text-slate-300 mt-1"></p></div>
+  </div>
+  <div class="p-5 sm:p-6">
+  <p class="text-xs text-red-500 font-semibold bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-5">অর্ডার করার পর অর্ডারের স্ক্রিনশট টেলিগ্রাম/হোয়াটসঅ্যাপে দিবেন, তারপর অর্ডার কনফার্ম করা হবে।</p>
+  <p class="text-xs font-extrabold mb-3">✦ PREMIUM PACKAGES — প্যাকেজ নির্বাচন করুন</p>
+  <div id="wrap"><div id="grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div><div class="fade"></div><button type="button" id="more">আরো দেখুন ⌄</button></div>
   <p id="empty" class="hidden text-center text-sm text-slate-400 py-8">এখনো কোনো প্যাকেজ নেই।</p>
+  </div>
  </div>
 </main>
 
@@ -61,6 +72,9 @@ const $=id=>document.getElementById(id);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const RULES={bkash:"নিজস্ব bKash পারসোনাল নাম্বার থেকে সেন্ডমানি করুন। ৫০০ টাকার বেশি হলে হাজারে ১৫ টাকা ক্যাশআউট চার্জ প্রযোজ্য। থার্ডপার্টি সিম/মার্চেন্ট থেকে পাঠাবেন না।",nagad:"নগদে সেন্ডমানি করুন, ক্যাশআউট/মার্চেন্ট নয়। নিজস্ব নাম্বার থেকে পাঠান।",rocket:"রকেটে সেন্ডমানি করুন, ক্যাশআউট/মার্চেন্ট নয়। নিজস্ব নাম্বার থেকে পাঠান।"};
 const LBL={bkash:'bKash',nagad:'Nagad',rocket:'Rocket'};
+const coinSvg=i=>`<svg viewBox="0 0 48 48"><defs><radialGradient id="c${i}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFF3C4"/><stop offset=".45" stop-color="#FFD452"/><stop offset="1" stop-color="#E8960C"/></radialGradient></defs><circle cx="24" cy="24" r="21" fill="url(#c${i})" stroke="#B4740A" stroke-width="1.5"/><circle cx="24" cy="24" r="16.5" fill="none" stroke="#fffdf0" stroke-width="1.4" stroke-dasharray="2.6 3.4"/><text x="24" y="31" text-anchor="middle" font-size="19" font-weight="800" fill="#9A5B00">♪</text></svg>`;
+const starSvg=i=>`<svg viewBox="0 0 48 48"><defs><linearGradient id="s${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE27A"/><stop offset=".55" stop-color="#FBBF24"/><stop offset="1" stop-color="#E8960C"/></linearGradient></defs><path d="M24 4l5.8 12 13.2 1.9-9.6 9.3 2.3 13.1L24 34l-11.7 6.3 2.3-13.1L5 17.9 18.2 16z" fill="url(#s${i})" stroke="#B4740A" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+let expanded=false;
 let CFG={},POST=null,PKGS=[],cur=null,disc=0,code='',busy=false;
 const pid=new URLSearchParams(location.search).get('id');
 const phone=v=>{v=String(v||'').replace(/[\s-]/g,'');if(/^01\d{9}$/.test(v))return'+88'+v;if(/^8801\d{9}$/.test(v))return'+'+v;if(/^\+8801\d{9}$/.test(v))return v;return''};
@@ -72,18 +86,22 @@ async function init(){
  if(!s||!s.exists())return $('nf').classList.remove('hidden');
  POST={id:s.id,...s.data()};document.title=POST.title+' | alimixstore';
  $('title').textContent=POST.title;$('desc').textContent=POST.desc||'';$('view').classList.remove('hidden');
+ if(POST.image){$('hImgTag').src=POST.image;$('hImg').classList.remove('hidden')}
  // ছবি নেই — শুধু টেক্সট। পুরনো coin/star ডেটা থাকলে source=coinPackages/starPackages দিলে সেগুলোই দেখাবে
  const src=POST.source||'packages';
  onSnapshot(collection(db,src),sn=>{
   PKGS=sn.docs.map(d=>{const x=d.data();return{id:d.id,label:x.label||(x.coins?x.coins+' Coins':x.stars?x.stars+' Stars':''),price:+x.price||0,oldPrice:+x.oldPrice||0,order:x.coins||x.stars||x.order||0,couponCode:x.couponCode||'',couponDiscount:+x.couponDiscount||0,postId:x.postId}}).filter(x=>x.label&&(src!=='packages'||x.postId===pid)).sort((a,b)=>a.order-b.order);
   $('empty').classList.toggle('hidden',PKGS.length>0);
-  $('grid').innerHTML=PKGS.map((p,i)=>`<button data-i="${i}" class="pkg"><p class="font-extrabold text-base">${esc(p.label)}</p>${p.oldPrice>p.price?`<p class="text-[11px] text-slate-400 line-through">৳${p.oldPrice}</p>`:''}<span class="pill">৳${p.price}</span></button>`).join('');
+  const ic=POST.icon||(POST.accountType==='facebook'?'star':'coin');
+  $('grid').innerHTML=PKGS.map((p,i)=>`<button data-i="${i}" class="pkg ${ic==='star'?'star':''}">${ic==='none'?'':`<span class="pk-icon block">${ic==='star'?starSvg(i):coinSvg(i)}</span>`}<p class="font-extrabold text-base">${esc(p.label)}</p>${p.oldPrice>p.price?`<p class="text-[11px] text-slate-400 line-through">৳${p.oldPrice}</p>`:''}<span class="pill">৳${p.price}</span></button>`).join('');
+  $('wrap').classList.toggle('collapsed',PKGS.length>6&&!expanded);
  });
 }
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.pkg');if(!b)return;cur=PKGS[+b.dataset.i];disc=0;code='';
  $('mName').textContent=`${POST.title} — ${cur.label}`;$('accLbl').textContent=POST.accountLabel||'TikTok Username@ *';
  ['acc','nm','ph','cp','pn','tx'].forEach(i=>$(i).value='');$('cpMsg').classList.add('hidden');$('err').classList.add('hidden');
  $('form').classList.remove('hidden');$('done').classList.add('hidden');pay();$('modal').classList.remove('hidden')});
+$('more').onclick=()=>{expanded=true;$('wrap').classList.remove('collapsed')};
 $('mClose').onclick=()=>$('modal').classList.add('hidden');
 function pay(){if(!cur)return;const m=$('pm').value;$('pmL').textContent=LBL[m];
  $('sn').textContent=CFG[m+'Number']||'শীঘ্রই যোগ হবে';$('rule').textContent='⚠️ '+(CFG[m+'Rule']||RULES[m]);$('total').textContent='৳'+Math.max(cur.price-disc,0)}
