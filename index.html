@@ -250,19 +250,20 @@ const postCard=p=>{const pr=p.postType==='product',pl=pr?plansOf(p):[],m=pl.leng
  <h3 class="font-bold text-base leading-snug mb-1">${esc(p.title)}</h3><p class="text-xs text-slate-500 clamp2 flex-1 mb-3">${esc(p.desc||'')}</p>
  ${has?`<p class="font-extrabold mb-2">${pl.length>1?'<span class="text-[11px] text-slate-500 font-semibold mr-1">শুরু</span>':''}৳${price}${old>price?` <s class="text-xs text-slate-400 font-normal">৳${old}</s>`:''}${offPill(price,old)}</p>`:''}
  <span class="btn text-center text-xs font-semibold py-2.5 rounded-xl">${pr?'বিস্তারিত দেখুন →':'প্যাকেজ দেখুন →'}</span></div></a>`};
-const prodCard=p=>{const bd=p.badge||(p.discountPercent?`-${p.discountPercent}%`:'');return `<a href="product.html?id=${encodeURIComponent(p.id)}" class="pcard">
+const prodCard=p=>{const bd=p.badge||(p.discountPercent?`-${p.discountPercent}%`:'');return `<a href="#d=${encodeURIComponent(p.id)}" class="pcard">
  <div class="pimg">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">`:'📦'}${bd?`<div class="pbadge">${esc(bd)}</div>`:''}</div>
  <div class="pbody"><div class="pcat">${esc(p.category||'Digital')}</div><div class="ptitle">${esc(p.name)}</div><div class="pdesc">${esc(p.description||'')}</div>
  <div class="pfoot"><div class="pprice">৳${esc(p.offerPrice||0)}${p.originalPrice>p.offerPrice?`<span class="old">৳${esc(p.originalPrice)}</span>`:''}${offPill(p.offerPrice,p.originalPrice,p.discountPercent)}</div><span class="pbuy">Buy Now →</span></div></div></a>`};
 
+const dpost=id=>{const x=PRODUCTS.find(y=>y.id===id);return x?{id:x.id,title:x.name||'',desc:x.description||'',content:'',image:x.image||'',postType:'product',variants:x.variants||'',price:+x.offerPrice||0,oldPrice:+x.originalPrice||0}:null};
 function route(){
- const m=location.hash.match(/^#p=(.+)$/),id=m?decodeURIComponent(m[1]):null;
+ const m=location.hash.match(/^#([pd])=(.+)$/),id=m?decodeURIComponent(m[2]):null,isD=!!m&&m[1]==='d';
  if(!id){
   $('home').classList.remove('hidden');$('pkgView').classList.add('hidden');$('others').classList.add('hidden');
   shownId=null;if(unsubPkg){unsubPkg();unsubPkg=null}if(unsubRev){unsubRev();unsubRev=null}
   const h=location.hash.slice(1);if(h&&$(h))setTimeout(()=>$(h).scrollIntoView(),0);
   return}
- const p=POSTS.find(x=>x.id===id);if(!p)return;
+ const p=isD?dpost(id):POSTS.find(x=>x.id===id);if(!p)return;
  $('home').classList.add('hidden');$('pkgView').classList.remove('hidden');
  POST=p;document.title=p.title+' | alimixstore';
  const isProd=p.postType==='product';$('pkgPart').classList.toggle('hidden',isProd);$('prodPart').classList.toggle('hidden',!isProd);
@@ -436,12 +437,12 @@ function renderDigital(){
  $('dpChips').innerHTML=cats.length?[`<button class="chip ${dpFilter==='all'?'on':''}" data-c="all">সব</button>`,...cats.map(c=>`<button class="chip ${dpFilter===c?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`)].join(''):'';
  const l=PRODUCTS.filter(p=>(dpFilter==='all'||(p.category||'').trim()===dpFilter)&&(!term||(p.name||'').toLowerCase().includes(term)||(p.description||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term))).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
  $('dpEmpty').classList.toggle('hidden',l.length>0);$('dpCount').textContent=l.length+'টি প্রোডাক্ট';
- $('dpGrid').innerHTML=l.map(p=>{const bd=p.badge||(p.discountPercent?`-${p.discountPercent}%`:'');return `<a href="product.html?id=${encodeURIComponent(p.id)}" class="pcard">
+ $('dpGrid').innerHTML=l.map(p=>{const bd=p.badge||(p.discountPercent?`-${p.discountPercent}%`:'');return `<a href="#d=${encodeURIComponent(p.id)}" class="pcard">
   <div class="pimg">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">`:'📦'}${bd?`<div class="pbadge">${esc(bd)}</div>`:''}</div>
   <div class="pbody"><div class="pcat">${esc(p.category||'Digital')}</div><div class="ptitle">${esc(p.name)}</div><div class="pdesc">${esc(p.description||'')}</div>
   <div class="pfoot"><div class="pprice">৳${esc(p.offerPrice||0)}${p.originalPrice>p.offerPrice?`<span class="old">৳${esc(p.originalPrice)}</span>`:''}${offPill(p.offerPrice,p.originalPrice,p.discountPercent)}</div><span class="pbuy">Buy Now →</span></div></div></a>`}).join('');
 }
 $('dpChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;dpFilter=b.dataset.c;renderDigital()});
 $('dpSearch').addEventListener('input',e=>{term=e.target.value.trim().toLowerCase();renderDigital()});
-onSnapshot(query(collection(db,'products'),orderBy('createdAt','desc')),s=>{PRODUCTS=s.docs.map(d=>({id:d.id,...d.data()}));renderDigital();renderOthers()});
+onSnapshot(query(collection(db,'products'),orderBy('createdAt','desc')),s=>{PRODUCTS=s.docs.map(d=>({id:d.id,...d.data()}));renderDigital();renderOthers();if(/^#d=/.test(location.hash))route()});
 </script></body></html>
