@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Admin Panel — alimixstore</title>
+<link id="faviconLink" rel="icon" type="image/jpeg" href="logo.jpg" />
+<script>
+  window.LOGO_EXTS = ['jpg','jpeg','png','webp','JPG','PNG'];
+  window.handleLogoError = function(el){
+    var idx = parseInt(el.getAttribute('data-logo-idx') || '0', 10) + 1;
+    if(idx < window.LOGO_EXTS.length){ el.setAttribute('data-logo-idx', idx); el.src = 'logo.' + window.LOGO_EXTS[idx]; }
+    else { el.onerror = null; el.style.display = 'none'; }
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  tailwind.config = { theme:{ extend:{ fontFamily:{ sans:['Hind Siliguri','sans-serif'] }, colors:{ primary:'#0D9488', secondary:'#10B981', accent:'#2DD4BF' } } } }
+</script>
+<style>
+  :root{ --primary:#0D9488; --secondary:#10B981; --accent:#2DD4BF; }
+  *{ font-family:'Hind Siliguri', sans-serif; }
+  body{ background:radial-gradient(1200px 600px at 10% -10%, rgba(13,148,136,0.28), transparent 60%), radial-gradient(1000px 500px at 100% 0%, rgba(24,119,242,0.20), transparent 55%), linear-gradient(180deg,#0B1226 0%,#0F172A 35%,#121a35 100%); background-attachment:fixed; color:#F1F5F9; min-height:100vh; }
+  .glass{ background:rgba(30,41,59,.55); backdrop-filter:blur(18px) saturate(140%); border:1px solid rgba(255,255,255,.08); }
+  .glass-strong{ background:rgba(15,23,42,.78); backdrop-filter:blur(22px) saturate(160%); border:1px solid rgba(255,255,255,.10); }
+  .text-grad{ background:linear-gradient(135deg,#2DD4BF,#10B981 60%,#1877F2); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .btn-neon{ background:linear-gradient(135deg,var(--primary),var(--secondary)); box-shadow:0 6px 24px -6px rgba(13,148,136,.55); transition:.2s; }
+  .btn-neon:hover{ transform:translateY(-2px); filter:brightness(1.08); }
+  .btn-neon:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+  .btn-danger{ background:linear-gradient(135deg,#ef4444,#b91c1c); }
+  .btn-ghost{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); }
+  .input{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:.75rem; padding:.65rem .9rem; font-size:.875rem; width:100%; transition:border-color .2s; color:#F1F5F9; }
+  .input:focus{ outline:none; border-color:var(--accent); }
+  .input option{ background:#0F172A; color:#F1F5F9; }
+  .tab-active{ background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; box-shadow:0 0 16px rgba(13,148,136,.4); }
+  ::-webkit-scrollbar{ height:8px; width:8px; } ::-webkit-scrollbar-thumb{ background:linear-gradient(var(--primary),var(--secondary)); border-radius:9999px; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; } .no-scrollbar{ scrollbar-width:none; }
+  .toggle{ width:42px; height:24px; border-radius:9999px; background:rgba(255,255,255,.15); position:relative; cursor:pointer; transition:.2s; flex-shrink:0; border:0; }
+  .toggle.on{ background:linear-gradient(135deg,var(--primary),var(--secondary)); }
+  .toggle .knob{ position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:9999px; background:#fff; transition:.2s; }
+  .toggle.on .knob{ left:20px; }
+  .table-row:hover{ background:rgba(255,255,255,.03); }
+  .modal-backdrop{ background:rgba(5,8,20,.75); backdrop-filter:blur(4px); }
+  .fade-in{ animation:fadeIn .25s ease both; } @keyframes fadeIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  .status-pill{ font-size:10px; padding:2px 10px; border-radius:9999px; font-weight:600; }
+  .status-pending{ background:rgba(251,191,36,.15); color:#fbbf24; } .status-verified{ background:rgba(59,130,246,.15); color:#60a5fa; }
+  .status-completed{ background:rgba(16,185,129,.15); color:#34d399; } .status-rejected{ background:rgba(239,68,68,.15); color:#f87171; }
+  .pkg-admin-card{ background:radial-gradient(circle at 50% 0%,rgba(250,204,21,.14),transparent 58%),linear-gradient(145deg,#182235,#0f172a 60%,#111827); border:1px solid rgba(250,204,21,.22); transition:.25s; }
+  .pkg-admin-card.star{ background:radial-gradient(circle at 50% 0%,rgba(24,119,242,.22),transparent 58%),linear-gradient(145deg,#182235,#0f172a 60%,#111827); border-color:rgba(24,119,242,.35); }
+  .pkg-admin-card:hover{ transform:translateY(-3px); }
+  #reportPrintArea{ background:#fff; color:#0F172A; }
+  #reportPrintArea table{ width:100%; border-collapse:collapse; font-size:11px; }
+  #reportPrintArea th, #reportPrintArea td{ border:1px solid #E2E8F0; padding:6px 8px; text-align:left; white-space:nowrap; }
+  #reportPrintArea th{ background:#F1F5F9; font-weight:700; } #reportPrintArea tfoot td{ font-weight:700; background:#F8FAFC; }
+</style>
+</head>
+<body>
+
+<!-- ============== LOGIN ============== -->
+<div id="loginScreen" class="min-h-screen flex items-center justify-center px-4">
+  <div class="glass-strong rounded-3xl p-8 w-full max-w-sm fade-in">
+    <div class="flex flex-col items-center mb-6">
+      <div class="w-14 h-14 rounded-2xl overflow-hidden mb-3 bg-white flex items-center justify-center p-1"><img src="logo.jpg" data-logo-idx="0" onerror="handleLogoError(this)" alt="logo" class="w-full h-full object-contain" /></div>
+      <h1 class="text-lg font-bold">alimixstore <span class="text-grad">Admin</span></h1>
+      <p class="text-xs text-slate-400 mt-1">অ্যাডমিন প্যানেলে লগইন করুন</p>
+    </div>
+    <form id="loginForm" class="space-y-3">
+      <div><label class="text-xs text-slate-400 mb-1 block">ইমেইল</label><input type="email" id="loginEmail" required class="input" placeholder="admin@example.com" autocomplete="username" /></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">পাসওয়ার্ড</label><input type="password" id="loginPassword" required class="input" placeholder="••••••••" autocomplete="current-password" /></div>
+      <p id="loginError" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2"></p>
+      <button type="submit" id="loginBtn" class="btn-neon w-full py-2.5 rounded-xl text-sm font-semibold mt-2">লগইন করুন</button>
+    </form>
+    <p class="text-[11px] text-slate-500 mt-5 leading-relaxed text-center">অ্যাডমিন অ্যাকাউন্ট Firebase Authentication (Email/Password) থেকে তৈরি করতে হবে।</p>
+  </div>
+</div>
+
+<!-- ============== DASHBOARD ============== -->
+<div id="dashboard" class="hidden">
+  <header class="sticky top-0 z-40 glass-strong border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center p-0.5"><img src="logo.jpg" data-logo-idx="0" onerror="handleLogoError(this)" alt="logo" class="w-full h-full object-contain" /></div>
+        <div><p class="font-bold text-sm leading-none">Admin <span class="text-grad">Panel</span></p><p class="text-[10px] text-slate-500" id="adminEmailTag"></p></div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" target="_blank" class="btn-ghost text-xs px-3 py-2 rounded-full hidden sm:inline-block">সাইট দেখুন</a>
+        <button id="logoutBtn" class="btn-danger text-xs px-4 py-2 rounded-full font-semibold">লগআউট</button>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
+      <button data-tab="overview" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">ড্যাশবোর্ড</button>
+      <button data-tab="orders" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">অর্ডার</button>
+      <button data-tab="products" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">🛍️ ডিজিটাল প্রোডাক্ট</button>
+      <button data-tab="coinpackages" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">🪙 কয়েন প্যাকেজ</button>
+      <button data-tab="starpackages" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">⭐ স্টার প্যাকেজ</button>
+      <button data-tab="report" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">📊 কুপন রিপোর্ট</button>
+      <button data-tab="reviews" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">রিভিউ</button>
+      <button data-tab="tutorials" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">ইউটিউব ভিডিও</button>
+      <button data-tab="settings" class="tab-btn shrink-0 text-xs px-4 py-2 rounded-full btn-ghost font-medium">সেটিংস</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- OVERVIEW -->
+    <section id="tab-overview" class="tab-panel">
+      <h2 class="text-xl font-bold mb-4">ওভারভিউ</h2>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">ডিজিটাল প্রোডাক্ট</p><p class="text-2xl font-bold text-accent" id="statTotalProducts">0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">কয়েন প্যাকেজ</p><p class="text-2xl font-bold text-accent" id="statCoinPackages">0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">স্টার প্যাকেজ</p><p class="text-2xl font-bold text-accent" id="statStarPackages">0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">মোট অর্ডার</p><p class="text-2xl font-bold text-accent" id="statOrders">0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">পেন্ডিং অর্ডার</p><p class="text-2xl font-bold text-amber-400" id="statPending">0</p></div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="glass rounded-2xl p-5"><p class="font-semibold text-sm mb-3">সাম্প্রতিক অর্ডার</p><div id="recentOrders" class="space-y-2 text-sm text-slate-300"></div></div>
+        <div class="glass rounded-2xl p-5"><p class="font-semibold text-sm mb-3">সাম্প্রতিক ডিজিটাল প্রোডাক্ট</p><div id="recentList" class="space-y-2 text-sm text-slate-300"></div></div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="tab-orders" class="tab-panel hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <h2 class="text-xl font-bold">অর্ডার তালিকা</h2>
+        <select id="orderStatusFilter" class="input !w-auto text-xs">
+          <option value="">সব স্ট্যাটাস</option><option value="pending">পেন্ডিং</option><option value="verified">যাচাইকৃত</option><option value="completed">সম্পন্ন</option><option value="rejected">বাতিল</option>
+        </select>
+      </div>
+      <div id="ordersList" class="space-y-3"></div>
+      <p id="ordersEmpty" class="hidden text-center text-sm text-slate-500 py-10">কোনো অর্ডার নেই।</p>
+    </section>
+
+    <!-- DIGITAL PRODUCTS -->
+    <section id="tab-products" class="tab-panel hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+        <h2 class="text-xl font-bold">ডিজিটাল প্রোডাক্ট ম্যানেজমেন্ট</h2>
+        <button id="openAddProduct" class="btn-neon text-xs font-semibold px-4 py-2.5 rounded-full">+ নতুন প্রোডাক্ট</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">এখানে যোগ করা প্রোডাক্ট ওয়েবসাইটের "ডিজিটাল প্রোডাক্ট" সেকশনে দেখাবে। গ্রাহক "Buy Now" চাপলে আলাদা ডিটেইলস পেজ খুলবে, যেখানে WhatsApp-এ অর্ডারের অপশন থাকবে (যেমন: Canva Pro, Telegram Premium, কোর্স)।</p>
+      <div class="glass rounded-2xl p-4 mb-4"><input id="productSearch" type="text" placeholder="প্রোডাক্ট সার্চ করুন..." class="input" /></div>
+      <div class="glass rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs text-slate-400 border-b border-white/10"><tr>
+              <th class="p-3">ছবি</th><th class="p-3">নাম</th><th class="p-3">ক্যাটাগরি</th><th class="p-3">মূল্য</th><th class="p-3">ছাড়</th><th class="p-3">পিন</th><th class="p-3 text-right">অ্যাকশন</th>
+            </tr></thead>
+            <tbody id="productTableBody"></tbody>
+          </table>
+        </div>
+        <p id="productsEmptyState" class="hidden text-center text-sm text-slate-500 py-10">কোনো প্রোডাক্ট নেই। "নতুন প্রোডাক্ট" চাপুন।</p>
+      </div>
+    </section>
+
+    <!-- COIN PACKAGES -->
+    <section id="tab-coinpackages" class="tab-panel hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <h2 class="text-xl font-bold">🪙 TikTok কয়েন প্যাকেজ</h2>
+        <button data-add-pkg="coin" class="btn-neon text-xs font-semibold px-4 py-2.5 rounded-full">+ নতুন প্যাকেজ</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">প্যাকেজগুলো ওয়েবসাইটের "TikTok Coin" ট্যাবে ছোট থেকে বড় ক্রমে দেখাবে। প্রতিটি প্যাকেজে আলাদা কুপন কোড ও ছাড় (৳) দেওয়া যাবে।</p>
+      <div id="coinPackageListWrap" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+      <p id="coinPackagesEmptyState" class="hidden text-center text-sm text-slate-500 py-10">কোনো প্যাকেজ যোগ করা হয়নি।</p>
+    </section>
+
+    <!-- STAR PACKAGES -->
+    <section id="tab-starpackages" class="tab-panel hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <h2 class="text-xl font-bold">⭐ Facebook স্টার প্যাকেজ</h2>
+        <button data-add-pkg="star" class="btn-neon text-xs font-semibold px-4 py-2.5 rounded-full">+ নতুন প্যাকেজ</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">প্যাকেজগুলো ওয়েবসাইটের "Facebook Star" ট্যাবে ছোট থেকে বড় ক্রমে দেখাবে। প্রতিটি প্যাকেজে আলাদা কুপন কোড ও ছাড় (৳) দেওয়া যাবে।</p>
+      <div id="starPackageListWrap" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+      <p id="starPackagesEmptyState" class="hidden text-center text-sm text-slate-500 py-10">কোনো প্যাকেজ যোগ করা হয়নি।</p>
+    </section>
+
+    <!-- COUPON REPORT -->
+    <section id="tab-report" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-1">📊 কুপন ব্যবহার ও ক্ষতির রিপোর্ট</h2>
+      <p class="text-xs text-slate-400 mb-4">কুপন ব্যবহার করে যত অর্ডার হয়েছে তার তালিকা, মোট ছাড় (ক্ষতি) এবং মোট আদায়ের হিসাব। ফিল্টার করে এক্সেল বা পিডিএফ ডাউনলোড করুন।</p>
+      <div class="glass rounded-2xl p-4 mb-5 flex flex-wrap items-end gap-3">
+        <div><label class="text-xs text-slate-400 mb-1 block">সময়কাল</label>
+          <select id="reportPeriod" class="input !w-auto text-xs"><option value="week">এই সপ্তাহ</option><option value="month" selected>এই মাস</option><option value="all">সব সময়</option><option value="custom">কাস্টম তারিখ</option></select></div>
+        <div id="reportCustomRange" class="hidden flex items-end gap-3">
+          <div><label class="text-xs text-slate-400 mb-1 block">শুরুর তারিখ</label><input type="date" id="reportStartDate" class="input text-xs" /></div>
+          <div><label class="text-xs text-slate-400 mb-1 block">শেষ তারিখ</label><input type="date" id="reportEndDate" class="input text-xs" /></div>
+        </div>
+        <div class="flex items-end gap-2 ml-auto">
+          <button id="exportExcelBtn" class="btn-neon text-xs font-semibold px-4 py-2.5 rounded-full whitespace-nowrap">⬇️ এক্সেল ডাউনলোড</button>
+          <button id="exportPdfBtn" class="btn-ghost text-xs font-semibold px-4 py-2.5 rounded-full whitespace-nowrap">⬇️ পিডিএফ ডাউনলোড</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">কুপন অর্ডার সংখ্যা</p><p class="text-2xl font-bold text-accent" id="repCount">0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">মূল (আসল) মূল্য মোট</p><p class="text-2xl font-bold text-slate-200" id="repOriginalTotal">৳0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">মোট ছাড় (ক্ষতি)</p><p class="text-2xl font-bold text-red-400" id="repDiscountTotal">৳0</p></div>
+        <div class="glass rounded-2xl p-4"><p class="text-xs text-slate-400 mb-1">মোট আদায় (পাওয়া টাকা)</p><p class="text-2xl font-bold text-emerald-400" id="repFinalTotal">৳0</p></div>
+      </div>
+      <div class="glass rounded-2xl p-3 sm:p-4 overflow-x-auto">
+        <div id="reportPrintArea" class="rounded-xl p-3 sm:p-4 min-w-[720px]">
+          <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-200">
+            <div class="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center p-0.5 border border-slate-200"><img src="logo.jpg" data-logo-idx="0" onerror="handleLogoError(this)" alt="logo" class="w-full h-full object-contain" /></div>
+            <div><p class="text-sm font-bold">alimixstore — কুপন রিপোর্ট</p><p class="text-[11px] text-slate-500" id="reportRangeLabel">—</p></div>
+          </div>
+          <table>
+            <thead><tr><th>তারিখ</th><th>কুপন কোড</th><th>গ্রাহক</th><th>ফোন</th><th>প্যাকেজ</th><th>আসল মূল্য</th><th>ছাড়</th><th>প্রদত্ত মূল্য</th></tr></thead>
+            <tbody id="reportTableBody"></tbody>
+            <tfoot><tr><td colspan="5">মোট</td><td id="reportFootOriginal">৳0</td><td id="reportFootDiscount">৳0</td><td id="reportFootFinal">৳0</td></tr></tfoot>
+          </table>
+          <p id="reportEmptyMsg" class="hidden text-center text-xs text-slate-500 py-6">এই সময়কালে কুপন ব্যবহার করে কোনো অর্ডার হয়নি।</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section id="tab-reviews" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-1">কাস্টমার রিভিউ</h2>
+      <p class="text-xs text-slate-400 mb-4">যে কেউ সাইট থেকে রিভিউ দিতে পারে — অনুপযুক্ত রিভিউ এখান থেকে মুছে ফেলুন।</p>
+      <div id="reviewListWrap" class="space-y-3"></div>
+      <p id="reviewsEmptyState" class="hidden text-center text-sm text-slate-500 py-10">কোনো রিভিউ নেই।</p>
+    </section>
+
+    <!-- TUTORIALS -->
+    <section id="tab-tutorials" class="tab-panel hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div><h2 class="text-xl font-bold">ইউটিউব ভিডিও / পপআপ ম্যানেজমেন্ট</h2><p class="text-xs text-slate-400 mt-1">হোমপেজে ঢুকলে পপআপে সিরিয়াল অনুযায়ী ভিডিও দেখাবে।</p></div>
+        <button id="openAddTutorial" class="btn-neon text-xs font-semibold px-4 py-2.5 rounded-full">+ নতুন ভিডিও</button>
+      </div>
+      <div class="glass rounded-2xl p-4 mb-4 flex items-center justify-between gap-3">
+        <div><p class="font-semibold text-sm">সাইটে ভিডিও পপআপ চালু থাকবে?</p><p class="text-[11px] text-slate-500">চালু থাকলে হোমপেজে ঢোকার সময় পপআপ দেখাবে।</p></div>
+        <button id="tutorialPopupToggle" class="toggle" type="button"><span class="knob"></span></button>
+      </div>
+      <div id="tutorialListWrap" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      <p id="tutorialsEmptyState" class="hidden text-center text-sm text-slate-500 py-10">কোনো YouTube ভিডিও যোগ করা হয়নি।</p>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="tab-settings" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-4">সেটিংস</h2>
+      <div class="glass rounded-2xl p-5 max-w-lg space-y-4">
+        <div>
+          <p class="text-sm font-semibold mb-3 text-slate-200">📞 যোগাযোগ</p>
+          <label class="text-xs text-slate-400 mb-1 block">WhatsApp নম্বর (দেশের কোডসহ, যেমন 8801XXXXXXXXX)</label>
+          <input id="cfgWhatsapp" class="input mb-3" placeholder="8801948901917" inputmode="numeric" />
+          <p class="text-[11px] text-slate-500 mb-3">এই নম্বরেই ডিজিটাল প্রোডাক্টের "WhatsApp-এ অর্ডার করুন" বাটন, ফ্লোটিং বাটন ও রিসিটের মেসেজ যাবে।</p>
+          <label class="text-xs text-slate-400 mb-1 block">Telegram লিংক</label>
+          <input id="cfgTelegramLink" class="input" placeholder="https://t.me/alimixstore" />
+        </div>
+
+        <div class="border-t border-white/10 pt-4">
+          <p class="text-sm font-semibold mb-3 text-slate-200">💳 পেমেন্ট নাম্বার</p>
+          <label class="text-xs text-slate-400 mb-1 block">bKash পার্সোনাল নাম্বার</label><input id="cfgBkash" class="input mb-3" placeholder="01XXXXXXXXX" />
+          <label class="text-xs text-slate-400 mb-1 block">Nagad পার্সোনাল নাম্বার</label><input id="cfgNagad" class="input mb-3" placeholder="01XXXXXXXXX" />
+          <label class="text-xs text-slate-400 mb-1 block">Rocket পার্সোনাল নাম্বার</label><input id="cfgRocket" class="input" placeholder="01XXXXXXXXXX" />
+        </div>
+
+        <div class="border-t border-white/10 pt-4">
+          <p class="text-sm font-semibold mb-3 text-slate-200">📢 পেমেন্ট নিয়মাবলী</p>
+          <p class="text-[11px] text-slate-500 mb-3">গ্রাহক যে মেথড সিলেক্ট করবে সেই মেথডের নিয়মটাই পেমেন্ট ধাপে হাইলাইট হয়ে দেখাবে।</p>
+          <label class="text-xs text-slate-400 mb-1 block">bKash নিয়মাবলী</label><textarea id="cfgBkashRule" rows="3" class="input mb-3"></textarea>
+          <label class="text-xs text-slate-400 mb-1 block">Nagad নিয়মাবলী</label><textarea id="cfgNagadRule" rows="3" class="input mb-3"></textarea>
+          <label class="text-xs text-slate-400 mb-1 block">Rocket নিয়মাবলী</label><textarea id="cfgRocketRule" rows="3" class="input"></textarea>
+        </div>
+
+        <div class="border-t border-white/10 pt-4">
+          <p class="text-sm font-semibold mb-1 text-slate-200">📢 উপরের Notice Slider</p>
+          <p class="text-[11px] text-slate-500 mb-3">"লেবেল: বার্তা" ফরম্যাটে লিখুন (কোলনের আগের অংশ ব্যাজে দেখাবে)।</p>
+          <label class="text-xs text-slate-400 mb-1 block">স্লাইড ১ — Navy</label><input id="cfgNotice1" class="input mb-3" />
+          <label class="text-xs text-slate-400 mb-1 block">স্লাইড ২ — Red</label><input id="cfgNotice2" class="input mb-3" />
+          <label class="text-xs text-slate-400 mb-1 block">স্লাইড ৩ — Yellow</label><input id="cfgNotice3" class="input" />
+        </div>
+
+        <div class="border-t border-white/10 pt-4">
+          <p class="text-sm font-semibold mb-3 text-slate-200">🤖 Telegram অর্ডার নোটিফিকেশন</p>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div><label class="text-xs text-slate-400 mb-1 block">Bot Token</label><input id="cfgTgToken" type="password" class="input" placeholder="BotFather থেকে পাওয়া token" autocomplete="off" /></div>
+            <div><label class="text-xs text-slate-400 mb-1 block">Chat ID</label><input id="cfgTgChat" class="input" placeholder="123456789" inputmode="numeric" /></div>
+          </div>
+          <p class="text-[11px] text-amber-300/90 mt-2 leading-relaxed">⚠️ অর্ডার নোটিফিকেশন ব্রাউজার থেকে সরাসরি Telegram-এ যায়, তাই এই token সাইটের ভিজিটররাও (ডেভেলপার টুলে) দেখতে পারে। শুধু এই কাজের জন্য আলাদা নতুন bot ব্যবহার করুন, অন্য কোনো কাজে নয়।</p>
+        </div>
+
+        <div class="border-t border-white/10 pt-4">
+          <p class="text-sm font-semibold mb-3 text-slate-200">🖼️ ক্যাটাগরি আইকন ছবি (ঐচ্ছিক)</p>
+          <label class="text-xs text-slate-400 mb-1 block">TikTok Coin সেকশনের ছবির লিংক</label>
+          <input id="cfgTiktokCardImage" class="input mb-3" placeholder="ছবির সরাসরি লিংক" />
+          <label class="text-xs text-slate-400 mb-1 block">Facebook Star সেকশনের ছবির লিংক</label>
+          <input id="cfgFacebookCardImage" class="input" placeholder="ছবির সরাসরি লিংক" />
+          <p class="text-[11px] text-slate-500 mt-1.5">খালি রাখলে ডিফল্ট আইকন দেখাবে।</p>
+        </div>
+
+        <p id="settingsError" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2"></p>
+        <p id="settingsSaved" class="hidden text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-3 py-2"></p>
+        <button id="saveSettingsBtn" class="btn-neon px-5 py-2.5 rounded-xl text-sm font-semibold">সংরক্ষণ করুন</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============== PRODUCT MODAL ============== -->
+<div id="productModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="glass-strong rounded-3xl w-full max-w-lg max-h-[92vh] overflow-y-auto fade-in">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-5"><h3 id="productModalTitle" class="text-lg font-bold">নতুন প্রোডাক্ট যোগ করুন</h3><button id="closeProductModal" class="w-8 h-8 rounded-full btn-ghost flex items-center justify-center">✕</button></div>
+      <form id="productForm" class="space-y-3">
+        <input type="hidden" id="productId" />
+        <div><label class="text-xs text-slate-400 mb-1 block">প্রোডাক্ট নাম *</label><input type="text" id="pName" required class="input" placeholder="যেমনঃ Canva Pro (১ বছর)" /></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs text-slate-400 mb-1 block">ক্যাটাগরি</label><input type="text" id="pCategory" class="input" placeholder="Subscription / কোর্স" /></div>
+          <div><label class="text-xs text-slate-400 mb-1 block">ব্যাজ (ঐচ্ছিক)</label><input type="text" id="pBadge" class="input" placeholder="Hot / New" /></div>
+        </div>
+        <div><label class="text-xs text-slate-400 mb-1 block">সংক্ষিপ্ত বিবরণ (কার্ডে দেখাবে)</label><textarea id="pDescription" rows="2" class="input" placeholder="১-২ লাইনের সংক্ষিপ্ত বিবরণ"></textarea></div>
+        <div>
+          <label class="text-xs text-slate-400 mb-1 block">বিস্তারিত বিবরণ (প্রোডাক্ট পেজে দেখাবে)</label>
+          <textarea id="pDetails" rows="6" class="input" placeholder="প্রতিটি অনুচ্ছেদ আলাদা লাইনে লিখুন। লিংক (https://...) দিলে ক্লিকযোগ্য হবে।"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs text-slate-400 mb-1 block">তালিকার শিরোনাম</label><input type="text" id="pTopicsTitle" class="input" placeholder="কোর্সের টপিক / ফিচারসমূহ" /></div>
+          <div class="flex items-end"><p class="text-[11px] text-slate-500">নিচের তালিকার উপরে এই শিরোনাম দেখাবে। খালি রাখলে "যা যা পাবেন"।</p></div>
+        </div>
+        <div><label class="text-xs text-slate-400 mb-1 block">টপিক / ফিচার তালিকা (প্রতি লাইনে একটি)</label><textarea id="pTopics" rows="4" class="input" placeholder="বাংলা মডেল টেস্ট&#10;গণিত মডেল টেস্ট"></textarea></div>
+        <div>
+          <label class="text-xs text-slate-400 mb-1 block">প্রোডাক্ট ছবি</label>
+          <input type="file" id="pImageFile" accept="image/*" class="input" />
+          <p class="text-[11px] text-slate-500 my-1 text-center">অথবা</p>
+          <input type="url" id="pImageUrlInput" class="input" placeholder="ছবির সরাসরি লিংক (URL) পেস্ট করুন" />
+          <div class="flex items-center gap-3 mt-2"><img id="pImagePreview" class="hidden w-16 h-16 rounded-lg object-cover border border-white/10" /><p id="uploadStatus" class="text-[11px] text-slate-500"></p></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs text-slate-400 mb-1 block">মূল মূল্য (৳)</label><input type="number" id="pOriginalPrice" min="0" class="input" /></div>
+          <div><label class="text-xs text-slate-400 mb-1 block">অফার মূল্য (৳) *</label><input type="number" id="pOfferPrice" required min="0" class="input" /></div>
+        </div>
+        <div><label class="text-xs text-slate-400 mb-1 block">ছাড় (%) — খালি রাখলে অটো হিসাব হবে</label><input type="number" id="pDiscountPercent" min="0" max="100" class="input" /></div>
+        <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+          <div><span class="text-sm">📌 পিন করুন</span><p class="text-[10px] text-slate-500 mt-0.5">ডিজিটাল প্রোডাক্ট সেকশনে সবার আগে দেখাবে</p></div>
+          <button type="button" id="pPinnedToggle" class="toggle"><span class="knob"></span></button>
+        </div>
+        <p id="productFormError" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2"></p>
+        <button type="submit" id="saveProductBtn" class="btn-neon w-full py-3 rounded-xl text-sm font-semibold mt-2">প্রোডাক্ট সংরক্ষণ করুন</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============== PACKAGE MODAL (coin + star) ============== -->
+<div id="packageModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="glass-strong rounded-3xl w-full max-w-sm max-h-[92vh] overflow-y-auto fade-in">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-5"><h3 id="packageModalTitle" class="text-lg font-bold">নতুন প্যাকেজ</h3><button id="closePackageModal" class="w-8 h-8 rounded-full btn-ghost flex items-center justify-center">✕</button></div>
+      <form id="packageForm" class="space-y-3">
+        <input type="hidden" id="pkgType" /><input type="hidden" id="pkgId" />
+        <div><label class="text-xs text-slate-400 mb-1 block" id="pkgAmountLabel">কয়েন সংখ্যা *</label><input type="number" id="pkgAmount" required min="1" class="input" placeholder="যেমনঃ 700" /></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">মূল্য (৳) *</label><input type="number" id="pkgPrice" required min="0" class="input" placeholder="যেমনঃ 1400" /></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">ক্রম (Order)</label><input type="number" id="pkgOrder" class="input" placeholder="খালি রাখলে অটো" /></div>
+        <div class="border-t border-white/10 pt-4">
+          <p class="text-sm font-semibold text-slate-200 mb-1">🎟️ এই প্যাকেজের কুপন (ঐচ্ছিক)</p>
+          <p class="text-[11px] text-slate-500 mb-3">কোড ও ছাড় দিলে গ্রাহক শুধু এই প্যাকেজ কেনার সময়ই কোডটি ব্যবহার করে ছাড় পাবে। খালি রাখলে কোনো কুপন কাজ করবে না।</p>
+          <label class="text-xs text-slate-400 mb-1 block">কুপন কোড</label><input type="text" id="pkgCouponCode" class="input mb-3" placeholder="যেমনঃ SAVE50" style="text-transform:uppercase" />
+          <label class="text-xs text-slate-400 mb-1 block">কুপন ছাড়ের পরিমাণ (৳)</label><input type="number" id="pkgCouponDiscount" min="0" class="input" placeholder="যেমনঃ 50" />
+        </div>
+        <p id="packageFormError" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2"></p>
+        <button type="submit" class="btn-neon w-full py-3 rounded-xl text-sm font-semibold mt-2">সংরক্ষণ করুন</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============== TUTORIAL MODAL ============== -->
+<div id="tutorialModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="glass-strong rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto fade-in">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-5"><h3 id="tutorialModalTitle" class="text-lg font-bold">নতুন YouTube ভিডিও</h3><button id="closeTutorialModal" class="w-8 h-8 rounded-full btn-ghost flex items-center justify-center">✕</button></div>
+      <form id="tutorialForm" class="space-y-3">
+        <input type="hidden" id="tutorialId" />
+        <div><label class="text-xs text-slate-400 mb-1 block">ভিডিও টাইটেল</label><input id="tTitle" class="input" required placeholder="যেমনঃ কিভাবে Coin কিনবেন?" /></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">YouTube ভিডিও লিংক</label><input id="tYoutubeUrl" type="url" class="input" required placeholder="https://www.youtube.com/watch?v=..." /></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">ক্রম (Serial / Order)</label><input id="tOrder" type="number" min="1" class="input" value="1" /></div>
+        <div class="flex items-center justify-between glass rounded-xl px-3 py-3"><div><p class="text-sm font-medium">ভিডিও চালু</p><p class="text-[10px] text-slate-500">বন্ধ করলে পপআপে দেখাবে না।</p></div><button id="tEnabledToggle" type="button" class="toggle on"><span class="knob"></span></button></div>
+        <p id="tutorialFormError" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2"></p>
+        <button type="submit" id="saveTutorialBtn" class="btn-neon w-full py-3 rounded-xl text-sm font-semibold">ভিডিও সংরক্ষণ করুন</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div id="confirmModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="glass-strong rounded-3xl w-full max-w-xs p-6 text-center fade-in">
+    <p class="text-3xl mb-2">🗑️</p><p class="font-semibold mb-1">নিশ্চিত মুছে ফেলবেন?</p>
+    <p class="text-xs text-slate-400 mb-5" id="confirmMsg">এই কাজটি আর ফিরিয়ে আনা যাবে না।</p>
+    <div class="flex gap-3"><button id="confirmCancel" class="btn-ghost flex-1 py-2.5 rounded-xl text-sm">বাতিল</button><button id="confirmOk" class="btn-danger flex-1 py-2.5 rounded-xl text-sm font-semibold">মুছুন</button></div>
+  </div>
+</div>
+
+<div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] glass-strong px-5 py-3 rounded-full text-sm font-medium fade-in"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAa8YiG1P7rZoCg-enQ0E2HflfDY7JFPyQ",
+    authDomain: "alimixstoretopup.firebaseapp.com",
+    projectId: "alimixstoretopup",
+    storageBucket: "alimixstoretopup.firebasestorage.app",
+    messagingSenderId: "102854684850",
+    appId: "1:102854684850:web:c11f6ee301a29ffdc7d9ab",
+    measurementId: "G-V5C651KRFD"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
+
+  const $ = id => document.getElementById(id);
+  const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const toDate = ts => (ts && ts.toDate) ? ts.toDate() : null;
+
+  /* ---------------- Auth ---------------- */
+  $('loginForm').addEventListener('submit', async e=>{
+    e.preventDefault(); $('loginError').classList.add('hidden');
+    $('loginBtn').textContent='লগইন হচ্ছে...'; $('loginBtn').disabled=true;
+    try{ await signInWithEmailAndPassword(auth, $('loginEmail').value, $('loginPassword').value); }
+    catch(err){ $('loginError').textContent='লগইন ব্যর্থ হয়েছে। ইমেইল/পাসওয়ার্ড যাচাই করুন।'; $('loginError').classList.remove('hidden'); }
+    finally{ $('loginBtn').textContent='লগইন করুন'; $('loginBtn').disabled=false; }
+  });
+  $('logoutBtn').addEventListener('click', ()=>signOut(auth));
+  onAuthStateChanged(auth, user=>{
+    if(user){ $('loginScreen').classList.add('hidden'); $('dashboard').classList.remove('hidden'); $('adminEmailTag').textContent=user.email; initListeners(); }
+    else{ $('dashboard').classList.add('hidden'); $('loginScreen').classList.remove('hidden'); }
+  });
+
+  /* ---------------- Tabs / toast ---------------- */
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  function setActiveTab(tab){
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+    $('tab-'+tab).classList.remove('hidden');
+    tabBtns.forEach(b=>b.classList.toggle('tab-active', b.dataset.tab===tab));
+    if(tab==='report') renderReport();
+  }
+  tabBtns.forEach(b=>b.addEventListener('click', ()=>setActiveTab(b.dataset.tab)));
+  setActiveTab('overview');
+  let toastTimer;
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.add('hidden'),2200); }
+
+  /* ---------------- State ---------------- */
+  let PRODUCTS=[], COIN_PACKAGES=[], STAR_PACKAGES=[], TUTORIALS=[], ORDERS=[], REVIEWS=[];
+  let tutorialPopupEnabled = true, listenersStarted = false, orderStatusFilterVal = '';
+
+  const DEFAULT_BKASH_RULE = "৫০০ টাকার বেশি লেনদেনের ক্ষেত্রে হাজারে ১৫ টাকা অতিরিক্ত ক্যাশআউট চার্জ দিতে হবে। কোনো প্রকার অবৈধ লেনদেন, থার্ডপার্টি সিম বা মার্চেন্ট থেকে টাকা পাঠাবেন না — নিজস্ব বিকাশ পারসোনাল নাম্বার থেকে পেমেন্ট করবেন। পেমেন্ট নাম্বার আমরা ভেরিফাই করি, এরকম কোনো অনৈতিক লেনদেন প্রমাণিত হলে আইন অনুযায়ী ব্যবস্থা গ্রহণ করা হবে।";
+  const DEFAULT_NAGAD_RULE = "নগদে সেন্ডমানি করবেন, ক্যাশআউট বা মার্চেন্ট পেমেন্ট নয়। নিজস্ব নগদ পারসোনাল নাম্বার থেকে পেমেন্ট করবেন — থার্ডপার্টি সিম থেকে পাঠাবেন না।";
+  const DEFAULT_ROCKET_RULE = "রকেটে সেন্ডমানি করবেন, ক্যাশআউট বা মার্চেন্ট পেমেন্ট নয়। নিজস্ব রকেট পারসোনাল নাম্বার থেকে পেমেন্ট করবেন — থার্ডপার্টি সিম থেকে পাঠাবেন না।";
+
+  function initListeners(){
+    if(listenersStarted) return; listenersStarted = true;
+    const err = n => e => console.error(n+' sync error:', e);
+
+    onSnapshot(query(collection(db,'products'), orderBy('createdAt','desc')), snap=>{ PRODUCTS=snap.docs.map(d=>({id:d.id,...d.data()})); renderProductTable(); renderOverview(); }, err('products'));
+    onSnapshot(collection(db,'coinPackages'), snap=>{ COIN_PACKAGES=snap.docs.map(d=>({id:d.id,...d.data()})); renderPkgList('coin'); renderOverview(); }, err('coinPackages'));
+    onSnapshot(collection(db,'starPackages'), snap=>{ STAR_PACKAGES=snap.docs.map(d=>({id:d.id,...d.data()})); renderPkgList('star'); renderOverview(); }, err('starPackages'));
+    onSnapshot(query(collection(db,'youtubeTutorials'), orderBy('order','asc')), snap=>{ TUTORIALS=snap.docs.map(d=>({id:d.id,...d.data()})); renderTutorialList(); }, err('tutorials'));
+    onSnapshot(query(collection(db,'orders'), orderBy('createdAt','desc')), snap=>{ ORDERS=snap.docs.map(d=>({id:d.id,...d.data()})); renderOrders(); renderOverview(); renderReport(); renderPkgList('coin'); renderPkgList('star'); }, err('orders'));
+    onSnapshot(query(collection(db,'reviews'), orderBy('createdAt','desc')), snap=>{ REVIEWS=snap.docs.map(d=>({id:d.id,...d.data()})); renderReviews(); }, err('reviews'));
+
+    onSnapshot(doc(db,'settings','storeConfig'), snap=>{
+      const d = snap.exists() ? snap.data() : {};
+      $('cfgWhatsapp').value = d.whatsappNumber || '';
+      $('cfgTelegramLink').value = d.telegramLink || '';
+      $('cfgBkash').value = d.bkashNumber || ''; $('cfgNagad').value = d.nagadNumber || ''; $('cfgRocket').value = d.rocketNumber || '';
+      $('cfgBkashRule').value = d.bkashRule || DEFAULT_BKASH_RULE; $('cfgNagadRule').value = d.nagadRule || DEFAULT_NAGAD_RULE; $('cfgRocketRule').value = d.rocketRule || DEFAULT_ROCKET_RULE;
+      $('cfgNotice1').value = d.notice1 || 'নোটিশ: TikTok Coin, Facebook Star ও ডিজিটাল প্রোডাক্ট — সব এক জায়গায়।';
+      $('cfgNotice2').value = d.notice2 || 'বিশেষ অফার: নতুন প্যাকেজ ও অফার দেখতে নিচে স্ক্রল করুন!';
+      $('cfgNotice3').value = d.notice3 || 'পেমেন্ট: bKash, Nagad ও Rocket দিয়ে অর্ডার করুন।';
+      $('cfgTiktokCardImage').value = d.tiktokCardImage || ''; $('cfgFacebookCardImage').value = d.facebookCardImage || '';
+      $('cfgTgToken').value = d.telegramBotToken || ''; $('cfgTgChat').value = d.telegramChatId || '';
+      tutorialPopupEnabled = d.tutorialPopupEnabled !== false; $('tutorialPopupToggle').classList.toggle('on', tutorialPopupEnabled);
+    }, err('settings'));
+  }
+
+  /* ---------------- Overview ---------------- */
+  const STATUS_LABEL = { pending:'পেন্ডিং', verified:'যাচাইকৃত', completed:'সম্পন্ন', rejected:'বাতিল' };
+  function renderOverview(){
+    $('statTotalProducts').textContent = PRODUCTS.length; $('statCoinPackages').textContent = COIN_PACKAGES.length; $('statStarPackages').textContent = STAR_PACKAGES.length;
+    $('statOrders').textContent = ORDERS.length; $('statPending').textContent = ORDERS.filter(o=>(o.status||'pending')==='pending').length;
+    $('recentList').innerHTML = PRODUCTS.slice(0,5).map(p=>`<div class="flex items-center justify-between glass rounded-xl px-3 py-2"><span class="truncate">${esc(p.name||'Untitled')}</span><span class="text-accent text-xs">৳${esc(p.offerPrice||0)}</span></div>`).join('') || '<p class="text-slate-500">কোনো প্রোডাক্ট নেই।</p>';
+    $('recentOrders').innerHTML = ORDERS.slice(0,5).map(o=>`<div class="flex items-center justify-between glass rounded-xl px-3 py-2 gap-2"><span class="truncate">${esc(o.productName||'')} · ${esc(o.customerName||'')}</span><span class="status-pill status-${esc(o.status||'pending')} shrink-0">${esc(STATUS_LABEL[o.status]||o.status||'পেন্ডিং')}</span></div>`).join('') || '<p class="text-slate-500">কোনো অর্ডার নেই।</p>';
+  }
+
+  /* ---------------- Orders ---------------- */
+  function renderOrders(){
+    const wrap = $('ordersList');
+    const list = orderStatusFilterVal ? ORDERS.filter(o=>(o.status||'pending')===orderStatusFilterVal) : ORDERS;
+    $('ordersEmpty').classList.toggle('hidden', list.length>0);
+    wrap.innerHTML = list.map(o=>{
+      const st = o.status || 'pending'; const d = toDate(o.createdAt);
+      const accName = o.accountType==='facebook' ? 'Facebook' : 'TikTok Username';
+      const couponLine = o.couponApplied ? `<p class="sm:col-span-2"><span class="text-slate-500">কুপন:</span> <span class="text-primary font-semibold">${esc(o.couponCode)}</span> (আসল ৳${esc(o.coinPackagePrice||0)} → ছাড় ৳${esc(o.couponDiscount||0)})</p>` : '';
+      return `
+      <div class="glass rounded-2xl p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div>
+            <p class="font-semibold text-sm">${esc(o.productName||'')} <span class="text-accent">৳${esc(o.offerPrice||0)}</span> ${o.couponApplied?'<span class="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-accent ml-1">🎟️ কুপন</span>':''}</p>
+            <p class="text-[10px] text-slate-500">${d?esc(d.toLocaleString('bn-BD'))+' · ':''}Order ID: ${esc(o.id)} · <span class="status-pill status-${esc(st)}">${esc(STATUS_LABEL[st]||st)}</span></p>
+          </div>
+          <select data-id="${esc(o.id)}" class="order-status-select input !w-auto text-xs py-1.5">
+            ${Object.keys(STATUS_LABEL).map(k=>`<option value="${k}" ${st===k?'selected':''}>${STATUS_LABEL[k]}</option>`).join('')}
+          </select>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-300 mb-3">
+          <p><span class="text-slate-500">গ্রাহক:</span> ${esc(o.customerName)}</p>
+          <p><span class="text-slate-500">ফোন:</span> ${esc(o.customerPhone)}</p>
+          <p><span class="text-slate-500">${accName}:</span> ${esc(o.accountIdentifier)}</p>
+          <p><span class="text-slate-500">পেমেন্ট মেথড:</span> ${esc((o.paymentMethod||'').toUpperCase())}</p>
+          <p><span class="text-slate-500">পেমেন্ট নাম্বার:</span> ${esc(o.paymentNumber)}</p>
+          <p><span class="text-slate-500">ট্রানজেকশন আইডি:</span> ${esc(o.transactionId)}</p>
+          ${couponLine}
+        </div>
+        <button class="delete-order-btn btn-danger text-xs px-3 py-1.5 rounded-full" data-id="${esc(o.id)}">ডিলিট</button>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.order-status-select').forEach(sel=>sel.addEventListener('change', async ()=>{
+      try{ await updateDoc(doc(db,'orders',sel.dataset.id),{status:sel.value}); toast('স্ট্যাটাস আপডেট হয়েছে ✓'); }catch(e){ console.error(e); toast('আপডেট ব্যর্থ হয়েছে।'); }
+    }));
+    wrap.querySelectorAll('.delete-order-btn').forEach(b=>b.addEventListener('click', ()=>confirmDelete('order', b.dataset.id)));
+  }
+  $('orderStatusFilter').addEventListener('change', e=>{ orderStatusFilterVal=e.target.value; renderOrders(); });
+
+  /* ---------------- Settings ---------------- */
+  $('saveSettingsBtn').addEventListener('click', async ()=>{
+    const errBox=$('settingsError'), okBox=$('settingsSaved'); errBox.classList.add('hidden'); okBox.classList.add('hidden');
+    try{
+      await setDoc(doc(db,'settings','storeConfig'),{
+        whatsappNumber: $('cfgWhatsapp').value.replace(/\D/g,''),
+        telegramLink: $('cfgTelegramLink').value.trim(),
+        bkashNumber: $('cfgBkash').value.trim(), nagadNumber: $('cfgNagad').value.trim(), rocketNumber: $('cfgRocket').value.trim(),
+        bkashRule: $('cfgBkashRule').value.trim(), nagadRule: $('cfgNagadRule').value.trim(), rocketRule: $('cfgRocketRule').value.trim(),
+        notice1: $('cfgNotice1').value.trim(), notice2: $('cfgNotice2').value.trim(), notice3: $('cfgNotice3').value.trim(),
+        telegramBotToken: $('cfgTgToken').value.trim(), telegramChatId: $('cfgTgChat').value.trim(),
+        tiktokCardImage: $('cfgTiktokCardImage').value.trim(), facebookCardImage: $('cfgFacebookCardImage').value.trim()
+      },{merge:true});
+      okBox.textContent='সেটিংস সংরক্ষণ হয়েছে ✓'; okBox.classList.remove('hidden'); toast('সেটিংস সংরক্ষণ হয়েছে ✓');
+    }catch(err){ errBox.textContent='সংরক্ষণ ব্যর্থ হয়েছে: '+err.message; errBox.classList.remove('hidden'); }
+  });
+
+  /* ---------------- Digital products ---------------- */
+  let productSearchTerm = '';
+  $('productSearch').addEventListener('input', e=>{ productSearchTerm=e.target.value.toLowerCase(); renderProductTable(); });
+  function renderProductTable(){
+    const list = PRODUCTS.filter(p=>!productSearchTerm || (p.name||'').toLowerCase().includes(productSearchTerm) || (p.category||'').toLowerCase().includes(productSearchTerm));
+    $('productsEmptyState').classList.toggle('hidden', list.length>0);
+    const body = $('productTableBody');
+    body.innerHTML = list.map(p=>`
+      <tr class="table-row border-b border-white/5">
+        <td class="p-3"><img src="${esc(p.image || 'https://placehold.co/60x60/1E293B/8b9cc2?text=?')}" class="w-10 h-10 rounded-lg object-cover" alt="" /></td>
+        <td class="p-3 max-w-[200px] truncate font-medium">${esc(p.name)}</td>
+        <td class="p-3 text-xs text-slate-400">${esc(p.category)}</td>
+        <td class="p-3 text-xs">${p.originalPrice?`<span class="line-through text-slate-500">৳${esc(p.originalPrice)}</span> `:''}<span class="text-accent font-semibold">৳${esc(p.offerPrice||0)}</span></td>
+        <td class="p-3 text-xs">${p.discountPercent?esc(p.discountPercent)+'%':'-'}</td>
+        <td class="p-3"><span class="text-xs px-2 py-1 rounded-full ${p.pinned?'bg-primary/20 text-accent':'bg-white/5 text-slate-500'}">${p.pinned?'📌 হ্যাঁ':'না'}</span></td>
+        <td class="p-3 text-right whitespace-nowrap">
+          <a href="product.html?id=${encodeURIComponent(p.id)}" target="_blank" class="btn-ghost text-xs px-3 py-1.5 rounded-full mr-1 inline-block">দেখুন</a>
+          <button class="edit-product-btn btn-ghost text-xs px-3 py-1.5 rounded-full mr-1" data-id="${esc(p.id)}">এডিট</button>
+          <button class="delete-product-btn btn-danger text-xs px-3 py-1.5 rounded-full" data-id="${esc(p.id)}">ডিলিট</button>
+        </td>
+      </tr>`).join('');
+    body.querySelectorAll('.edit-product-btn').forEach(b=>b.addEventListener('click', ()=>openProductModal(b.dataset.id)));
+    body.querySelectorAll('.delete-product-btn').forEach(b=>b.addEventListener('click', ()=>confirmDelete('product', b.dataset.id)));
+  }
+
+  const productModal=$('productModal'), productForm=$('productForm'), pPinnedToggle=$('pPinnedToggle');
+  let uploadedImageUrl = '';
+  $('openAddProduct').addEventListener('click', ()=>openProductModal(null));
+  $('closeProductModal').addEventListener('click', ()=>productModal.classList.add('hidden'));
+  pPinnedToggle.addEventListener('click', ()=>pPinnedToggle.classList.toggle('on'));
+
+  function openProductModal(id){
+    productForm.reset(); $('productFormError').classList.add('hidden'); $('pImagePreview').classList.add('hidden'); $('uploadStatus').textContent=''; pPinnedToggle.classList.remove('on'); uploadedImageUrl='';
+    if(id){
+      const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
+      $('productModalTitle').textContent='প্রোডাক্ট এডিট করুন'; $('productId').value=id;
+      $('pName').value=p.name||''; $('pCategory').value=p.category||''; $('pBadge').value=p.badge||''; $('pDescription').value=p.description||'';
+      $('pDetails').value=p.details||''; $('pTopicsTitle').value=p.topicsTitle||''; $('pTopics').value=(p.topics||[]).join('\n');
+      $('pOriginalPrice').value=p.originalPrice||''; $('pOfferPrice').value=p.offerPrice??''; $('pDiscountPercent').value=p.discountPercent||'';
+      uploadedImageUrl = p.image || '';
+      if(p.image){ $('pImagePreview').src=p.image; $('pImagePreview').classList.remove('hidden'); $('pImageUrlInput').value=p.image; }
+      if(p.pinned) pPinnedToggle.classList.add('on');
+    }else{ $('productModalTitle').textContent='নতুন প্রোডাক্ট যোগ করুন'; $('productId').value=''; }
+    productModal.classList.remove('hidden');
+  }
+  $('pImageFile').addEventListener('change', async e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const status=$('uploadStatus'); status.textContent='ছবি আপলোড হচ্ছে...';
+    try{
+      const fileRef = ref(storage, `products/${Date.now()}_${file.name.replace(/[^\w.\-]/g,'_')}`);
+      await uploadBytes(fileRef, file); uploadedImageUrl = await getDownloadURL(fileRef);
+      $('pImageUrlInput').value=''; $('pImagePreview').src=uploadedImageUrl; $('pImagePreview').classList.remove('hidden'); status.textContent='আপলোড সম্পন্ন ✓';
+    }catch(err){ status.textContent='আপলোড ব্যর্থ হয়েছে। নিচে ছবির লিংক পেস্ট করে ব্যবহার করতে পারেন।'; console.error(err); }
+  });
+  $('pImageUrlInput').addEventListener('input', e=>{
+    const url=e.target.value.trim();
+    if(url){ uploadedImageUrl=url; $('pImagePreview').src=url; $('pImagePreview').classList.remove('hidden'); $('uploadStatus').textContent='লিংক থেকে ছবি সেট হয়েছে ✓'; }
+  });
+  productForm.addEventListener('submit', async e=>{
+    e.preventDefault(); const errBox=$('productFormError'); errBox.classList.add('hidden');
+    const btn=$('saveProductBtn'); btn.disabled=true; btn.textContent='সংরক্ষণ হচ্ছে...';
+    try{
+      const id=$('productId').value;
+      const original=+$('pOriginalPrice').value||0, offer=+$('pOfferPrice').value||0;
+      let discount=+$('pDiscountPercent').value||0;
+      if(!discount && original>0 && offer>=0 && offer<original) discount=Math.round(((original-offer)/original)*100);
+      const data = {
+        name:$('pName').value.trim(), category:$('pCategory').value.trim(), badge:$('pBadge').value.trim(),
+        description:$('pDescription').value.trim(), details:$('pDetails').value.trim(),
+        topicsTitle:$('pTopicsTitle').value.trim(), topics:$('pTopics').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        image:uploadedImageUrl||'', originalPrice:original, offerPrice:offer, discountPercent:discount, pinned:pPinnedToggle.classList.contains('on')
+      };
+      if(id){ await updateDoc(doc(db,'products',id), data); toast('প্রোডাক্ট আপডেট হয়েছে ✓'); }
+      else{ data.createdAt=serverTimestamp(); await addDoc(collection(db,'products'), data); toast('নতুন প্রোডাক্ট যোগ হয়েছে ✓'); }
+      productModal.classList.add('hidden');
+    }catch(err){ errBox.textContent='সংরক্ষণ ব্যর্থ হয়েছে: '+err.message; errBox.classList.remove('hidden'); }
+    finally{ btn.disabled=false; btn.textContent='প্রোডাক্ট সংরক্ষণ করুন'; }
+  });
+
+  /* ---------------- Packages (coin + star) ---------------- */
+  const PKG = {
+    coin: { col:'coinPackages', field:'coins', unit:'Coins', label:'কয়েন সংখ্যা *', title:'কয়েন প্যাকেজ', list:()=>COIN_PACKAGES, wrap:'coinPackageListWrap', empty:'coinPackagesEmptyState', cls:'' },
+    star: { col:'starPackages', field:'stars', unit:'Stars', label:'স্টার সংখ্যা *', title:'স্টার প্যাকেজ', list:()=>STAR_PACKAGES, wrap:'starPackageListWrap', empty:'starPackagesEmptyState', cls:'star' }
+  };
+  const packageModal=$('packageModal'), packageForm=$('packageForm');
+  document.querySelectorAll('[data-add-pkg]').forEach(b=>b.addEventListener('click', ()=>openPackageModal(b.dataset.addPkg, null)));
+  $('closePackageModal').addEventListener('click', ()=>packageModal.classList.add('hidden'));
+
+  function openPackageModal(type, id){
+    const cfg = PKG[type]; packageForm.reset(); $('packageFormError').classList.add('hidden');
+    $('pkgType').value=type; $('pkgAmountLabel').textContent=cfg.label;
+    if(id){
+      const c = cfg.list().find(x=>x.id===id); if(!c) return;
+      $('packageModalTitle').textContent=`${cfg.title} এডিট করুন`; $('pkgId').value=id;
+      $('pkgAmount').value=c[cfg.field]||''; $('pkgPrice').value=c.price||''; $('pkgOrder').value=c.order||''; $('pkgCouponCode').value=c.couponCode||''; $('pkgCouponDiscount').value=c.couponDiscount||'';
+    }else{ $('packageModalTitle').textContent=`নতুন ${cfg.title}`; $('pkgId').value=''; }
+    packageModal.classList.remove('hidden');
+  }
+  packageForm.addEventListener('submit', async e=>{
+    e.preventDefault(); const errBox=$('packageFormError'); errBox.classList.add('hidden');
+    try{
+      const type=$('pkgType').value, cfg=PKG[type], id=$('pkgId').value;
+      const code=$('pkgCouponCode').value.trim().toUpperCase(), disc=+$('pkgCouponDiscount').value||0, enteredOrder=$('pkgOrder').value.trim();
+      const data = { [cfg.field]:+$('pkgAmount').value||0, price:+$('pkgPrice').value||0, order: enteredOrder==='' ? Date.now() : (+enteredOrder||0), couponCode:code, couponDiscount: code ? disc : 0 };
+      if(id){ await updateDoc(doc(db,cfg.col,id), data); toast('প্যাকেজ আপডেট হয়েছে ✓'); }
+      else{ await addDoc(collection(db,cfg.col), data); toast('নতুন প্যাকেজ যোগ হয়েছে ✓'); }
+      packageModal.classList.add('hidden');
+    }catch(err){ errBox.textContent='সংরক্ষণ ব্যর্থ হয়েছে: '+err.message; errBox.classList.remove('hidden'); }
+  });
+  function renderPkgList(type){
+    const cfg=PKG[type]; const sorted=[...cfg.list()].sort((a,b)=>(a[cfg.field]||0)-(b[cfg.field]||0)); const wrap=$(cfg.wrap);
+    $(cfg.empty).classList.toggle('hidden', sorted.length>0);
+    wrap.innerHTML = sorted.map(c=>{
+      const used = c.couponCode ? ORDERS.filter(o=>o.couponApplied && (o.couponCode||'').toUpperCase()===(c.couponCode||'').toUpperCase()).length : 0;
+      const badge = c.couponCode ? `<p class="text-[11px] mt-1"><span class="px-2 py-0.5 rounded-full bg-primary/15 text-accent font-semibold">🎟️ ${esc(c.couponCode)} · -৳${esc(c.couponDiscount||0)}</span></p><p class="text-[10px] text-slate-500 mt-1">ব্যবহার হয়েছে: ${used} বার</p>` : '<p class="text-[10px] text-slate-500 mt-1">কোনো কুপন সেট করা নেই</p>';
+      return `<div class="glass rounded-2xl p-4 flex flex-col gap-2 pkg-admin-card ${cfg.cls}">
+        <div><p class="text-sm font-extrabold text-white">${esc(c[cfg.field])} ${cfg.unit}</p><p class="text-sm font-extrabold ${type==='star'?'text-sky-300':'text-yellow-300'}">৳${esc(c.price)}</p><p class="text-[10px] text-slate-500 mt-1">ক্রম: ${esc(c.order??'-')}</p>${badge}</div>
+        <div class="flex gap-1 mt-1"><button class="edit-pkg-btn btn-ghost text-xs px-3 py-1.5 rounded-full flex-1" data-id="${esc(c.id)}">এডিট</button><button class="delete-pkg-btn btn-danger text-xs px-3 py-1.5 rounded-full flex-1" data-id="${esc(c.id)}">ডিলিট</button></div>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.edit-pkg-btn').forEach(b=>b.addEventListener('click', ()=>openPackageModal(type,b.dataset.id)));
+    wrap.querySelectorAll('.delete-pkg-btn').forEach(b=>b.addEventListener('click', ()=>confirmDelete(type==='coin'?'coinPackage':'starPackage', b.dataset.id)));
+  }
+
+  /* ---------------- Reviews ---------------- */
+  function renderReviews(){
+    $('reviewsEmptyState').classList.toggle('hidden', REVIEWS.length>0);
+    $('reviewListWrap').innerHTML = REVIEWS.map(r=>{ const d=toDate(r.createdAt); return `
+      <div class="glass rounded-2xl p-4 flex items-start justify-between gap-3">
+        <div class="min-w-0"><p class="text-sm font-semibold">${esc(r.name)} <span class="text-amber-400 text-xs ml-1">${'★'.repeat(Math.max(0,Math.min(5,+r.rating||0)))}</span></p>
+          <p class="text-[10px] text-slate-500 mb-1">${d?esc(d.toLocaleString('bn-BD')):''}</p><p class="text-xs text-slate-300 break-words">${esc(r.comment)}</p></div>
+        <button class="delete-review-btn btn-danger text-xs px-3 py-1.5 rounded-full shrink-0" data-id="${esc(r.id)}">ডিলিট</button>
+      </div>`; }).join('');
+    $('reviewListWrap').querySelectorAll('.delete-review-btn').forEach(b=>b.addEventListener('click', ()=>confirmDelete('review', b.dataset.id)));
+  }
+
+  /* ---------------- Coupon report ---------------- */
+  const reportPeriodSel=$('reportPeriod');
+  reportPeriodSel.addEventListener('change', ()=>{ $('reportCustomRange').classList.toggle('hidden', reportPeriodSel.value!=='custom'); renderReport(); });
+  $('reportStartDate').addEventListener('change', renderReport); $('reportEndDate').addEventListener('change', renderReport);
+
+  function getReportRange(){
+    const period=reportPeriodSel.value, now=new Date(); let start=null, end=null;
+    if(period==='week'){ start=new Date(now); start.setDate(now.getDate()-now.getDay()); start.setHours(0,0,0,0); end=new Date(now); end.setHours(23,59,59,999); }
+    else if(period==='month'){ start=new Date(now.getFullYear(), now.getMonth(), 1); end=new Date(now); end.setHours(23,59,59,999); }
+    else if(period==='custom'){ const s=$('reportStartDate').value, e=$('reportEndDate').value; if(s) start=new Date(s+'T00:00:00'); if(e) end=new Date(e+'T23:59:59'); }
+    return { start, end, period };
+  }
+  function getCouponOrdersInRange(){
+    const { start, end } = getReportRange();
+    return ORDERS.filter(o=>{
+      if(!o.couponApplied) return false;
+      const d = toDate(o.createdAt);
+      if(!d) return !(start||end);
+      if(start && d<start) return false; if(end && d>end) return false; return true;
+    }).sort((a,b)=>(toDate(b.createdAt)||0)-(toDate(a.createdAt)||0));
+  }
+  function renderReport(){
+    const list=getCouponOrdersInRange(), { start, end, period } = getReportRange();
+    let label = ({week:'এই সপ্তাহ',month:'এই মাস',all:'সব সময়',custom:'কাস্টম তারিখ'})[period]||'';
+    if(start||end){ const f=d=>d?d.toLocaleDateString('bn-BD'):'—'; label+=` (${f(start)} থেকে ${f(end)})`; }
+    $('reportRangeLabel').textContent=label;
+    let sO=0,sD=0,sF=0;
+    $('reportTableBody').innerHTML = list.map(o=>{
+      const d=toDate(o.createdAt), orig=o.coinPackagePrice||o.originalPrice||0, disc=o.couponDiscount||0, fin=o.offerPrice||0; sO+=orig; sD+=disc; sF+=fin;
+      return `<tr><td>${d?esc(d.toLocaleString('bn-BD')):'—'}</td><td>${esc(o.couponCode)}</td><td>${esc(o.customerName)}</td><td>${esc(o.customerPhone)}</td><td>${esc(o.productName)}</td><td>৳${orig}</td><td>-৳${disc}</td><td>৳${fin}</td></tr>`;
+    }).join('');
+    $('reportEmptyMsg').classList.toggle('hidden', list.length>0);
+    $('repCount').textContent=list.length; $('repOriginalTotal').textContent=`৳${sO}`; $('repDiscountTotal').textContent=`৳${sD}`; $('repFinalTotal').textContent=`৳${sF}`;
+    $('reportFootOriginal').textContent=`৳${sO}`; $('reportFootDiscount').textContent=`-৳${sD}`; $('reportFootFinal').textContent=`৳${sF}`;
+    window._rl=list; window._rt={sO,sD,sF};
+  }
+  $('exportExcelBtn').addEventListener('click', ()=>{
+    const list=window._rl||[]; if(!list.length){ toast('এই সময়কালে কোনো কুপন অর্ডার নেই।'); return; }
+    const rows = list.map(o=>{ const d=toDate(o.createdAt); return { 'তারিখ':d?d.toLocaleString('bn-BD'):'', 'কুপন কোড':o.couponCode||'', 'গ্রাহক':o.customerName||'', 'ফোন':o.customerPhone||'', 'প্যাকেজ':o.productName||'', 'আসল মূল্য (৳)':o.coinPackagePrice||o.originalPrice||0, 'ছাড় (৳)':o.couponDiscount||0, 'প্রদত্ত মূল্য (৳)':o.offerPrice||0, 'ট্রানজেকশন আইডি':o.transactionId||'', 'স্ট্যাটাস':o.status||'' }; });
+    const t=window._rt||{sO:0,sD:0,sF:0};
+    rows.push({ 'তারিখ':'','কুপন কোড':'','গ্রাহক':'','ফোন':'','প্যাকেজ':'মোট','আসল মূল্য (৳)':t.sO,'ছাড় (৳)':t.sD,'প্রদত্ত মূল্য (৳)':t.sF,'ট্রানজেকশন আইডি':'','স্ট্যাটাস':'' });
+    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Coupon Report');
+    XLSX.writeFile(wb, `alimix-coupon-report-${new Date().toISOString().slice(0,10)}.xlsx`);
+  });
+  $('exportPdfBtn').addEventListener('click', async ()=>{
+    const list=window._rl||[]; if(!list.length){ toast('এই সময়কালে কোনো কুপন অর্ডার নেই।'); return; }
+    const btn=$('exportPdfBtn'), orig=btn.textContent; btn.disabled=true; btn.textContent='তৈরি হচ্ছে...';
+    try{
+      const canvas = await html2canvas($('reportPrintArea'),{ scale:2, backgroundColor:'#ffffff', useCORS:true });
+      const img=canvas.toDataURL('image/png'); const { jsPDF }=window.jspdf; const pdf=new jsPDF('p','pt','a4');
+      const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight(), iw=pw-40, ih=canvas.height*iw/canvas.width;
+      let left=ih, pos=20; pdf.addImage(img,'PNG',20,pos,iw,ih); left-=(ph-40);
+      while(left>0){ pos=left-ih+20; pdf.addPage(); pdf.addImage(img,'PNG',20,pos,iw,ih); left-=(ph-40); }
+      pdf.save(`alimix-coupon-report-${new Date().toISOString().slice(0,10)}.pdf`);
+    }catch(err){ console.error(err); toast('পিডিএফ তৈরি করতে সমস্যা হয়েছে।'); }
+    finally{ btn.disabled=false; btn.textContent=orig; }
+  });
+
+  /* ---------------- YouTube tutorials ---------------- */
+  const tutorialModal=$('tutorialModal'), tutorialForm=$('tutorialForm'); let editingTutorialEnabled=true;
+  $('tutorialPopupToggle').addEventListener('click', async ()=>{
+    tutorialPopupEnabled=!tutorialPopupEnabled; $('tutorialPopupToggle').classList.toggle('on', tutorialPopupEnabled);
+    try{ await setDoc(doc(db,'settings','storeConfig'),{tutorialPopupEnabled},{merge:true}); toast(tutorialPopupEnabled?'ভিডিও পপআপ চালু হয়েছে ✓':'ভিডিও পপআপ বন্ধ হয়েছে ✓'); }catch(e){ console.error(e); }
+  });
+  const youtubeId = url => { const m=(url||'').match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/); return m?m[1]:''; };
+  function renderTutorialList(){
+    $('tutorialsEmptyState').classList.toggle('hidden', TUTORIALS.length>0);
+    const wrap=$('tutorialListWrap');
+    wrap.innerHTML = TUTORIALS.map((t,i)=>`<div class="glass rounded-2xl p-4 flex items-center gap-3">
+      <div class="w-20 h-12 rounded-lg bg-slate-900 overflow-hidden shrink-0">${youtubeId(t.youtubeUrl)?`<img class="w-full h-full object-cover" src="https://img.youtube.com/vi/${esc(youtubeId(t.youtubeUrl))}/hqdefault.jpg" alt="" />`:''}</div>
+      <div class="min-w-0 flex-1"><p class="font-semibold text-sm truncate">${i+1}. ${esc(t.title||'(টাইটেল নেই)')}</p><p class="text-[10px] text-slate-500 truncate">ক্রম: ${esc(t.order??'-')} · ${t.enabled!==false?'চালু':'বন্ধ'}</p></div>
+      <div class="flex flex-col gap-1"><button class="edit-tutorial-btn btn-ghost text-xs px-3 py-1.5 rounded-full" data-id="${esc(t.id)}">এডিট</button><button class="delete-tutorial-btn btn-danger text-xs px-3 py-1.5 rounded-full" data-id="${esc(t.id)}">ডিলিট</button></div></div>`).join('');
+    wrap.querySelectorAll('.edit-tutorial-btn').forEach(b=>b.addEventListener('click', ()=>openTutorialModal(b.dataset.id)));
+    wrap.querySelectorAll('.delete-tutorial-btn').forEach(b=>b.addEventListener('click', ()=>confirmDelete('tutorial', b.dataset.id)));
+  }
+  function openTutorialModal(id){
+    tutorialForm.reset(); $('tutorialFormError').classList.add('hidden');
+    if(id){ const t=TUTORIALS.find(x=>x.id===id); if(!t) return; $('tutorialModalTitle').textContent='YouTube ভিডিও এডিট করুন'; $('tutorialId').value=id; $('tTitle').value=t.title||''; $('tYoutubeUrl').value=t.youtubeUrl||''; $('tOrder').value=t.order||1; editingTutorialEnabled=t.enabled!==false; }
+    else{ $('tutorialModalTitle').textContent='নতুন YouTube ভিডিও'; $('tutorialId').value=''; $('tOrder').value=TUTORIALS.length+1; editingTutorialEnabled=true; }
+    $('tEnabledToggle').classList.toggle('on', editingTutorialEnabled); tutorialModal.classList.remove('hidden');
+  }
+  $('tEnabledToggle').addEventListener('click', ()=>{ editingTutorialEnabled=!editingTutorialEnabled; $('tEnabledToggle').classList.toggle('on', editingTutorialEnabled); });
+  $('openAddTutorial').addEventListener('click', ()=>openTutorialModal(null));
+  $('closeTutorialModal').addEventListener('click', ()=>tutorialModal.classList.add('hidden'));
+  tutorialForm.addEventListener('submit', async e=>{
+    e.preventDefault(); const errBox=$('tutorialFormError'); errBox.classList.add('hidden'); const btn=$('saveTutorialBtn'); btn.disabled=true;
+    try{
+      const id=$('tutorialId').value;
+      const data={ title:$('tTitle').value.trim(), youtubeUrl:$('tYoutubeUrl').value.trim(), order:+$('tOrder').value||1, enabled:editingTutorialEnabled };
+      if(!youtubeId(data.youtubeUrl)) throw new Error('সঠিক YouTube লিংক দিন।');
+      if(id) await updateDoc(doc(db,'youtubeTutorials',id), data); else await addDoc(collection(db,'youtubeTutorials'), data);
+      tutorialModal.classList.add('hidden'); toast('YouTube ভিডিও সংরক্ষণ হয়েছে ✓');
+    }catch(err){ errBox.textContent=err.message||'সংরক্ষণ ব্যর্থ হয়েছে'; errBox.classList.remove('hidden'); }
+    finally{ btn.disabled=false; }
+  });
+
+  /* ---------------- Delete confirm ---------------- */
+  const confirmModal=$('confirmModal'); let pendingDelete=null;
+  const DEL_MSG = { tutorial:'YouTube ভিডিওটি স্থায়ীভাবে মুছে যাবে।', product:'প্রোডাক্টটি স্থায়ীভাবে মুছে যাবে।', coinPackage:'কয়েন প্যাকেজটি স্থায়ীভাবে মুছে যাবে। (আগের অর্ডারের হিসাব রিপোর্টে থেকে যাবে)', starPackage:'স্টার প্যাকেজটি স্থায়ীভাবে মুছে যাবে। (আগের অর্ডারের হিসাব রিপোর্টে থেকে যাবে)', order:'অর্ডারটি স্থায়ীভাবে মুছে যাবে।', review:'রিভিউটি স্থায়ীভাবে মুছে যাবে।' };
+  const DEL_COL = { product:'products', coinPackage:'coinPackages', starPackage:'starPackages', tutorial:'youtubeTutorials', order:'orders', review:'reviews' };
+  function confirmDelete(type,id){ pendingDelete={type,id}; $('confirmMsg').textContent=DEL_MSG[type]||DEL_MSG.product; confirmModal.classList.remove('hidden'); }
+  $('confirmCancel').addEventListener('click', ()=>{ confirmModal.classList.add('hidden'); pendingDelete=null; });
+  $('confirmOk').addEventListener('click', async ()=>{
+    if(!pendingDelete) return;
+    try{ await deleteDoc(doc(db, DEL_COL[pendingDelete.type]||'products', pendingDelete.id)); toast('মুছে ফেলা হয়েছে ✓'); }
+    catch(err){ console.error(err); toast('মুছতে ব্যর্থ হয়েছে।'); }
+    confirmModal.classList.add('hidden'); pendingDelete=null;
+  });
+  [productModal, packageModal, tutorialModal, confirmModal].forEach(m=>m.addEventListener('click', e=>{ if(e.target===m) m.classList.add('hidden'); }));
+</script>
+</body>
+</html>

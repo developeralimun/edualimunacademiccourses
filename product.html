@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>প্রোডাক্ট বিবরণ | alimixstore</title>
+<meta id="metaDesc" name="description" content="alimixstore-এ প্রিমিয়াম ডিজিটাল প্রোডাক্টের বিস্তারিত দেখুন এবং WhatsApp-এ অর্ডার করুন।" />
+<meta name="theme-color" content="#0F172A" />
+<link id="faviconLink" rel="icon" type="image/jpeg" href="logo.jpg" />
+<link rel="apple-touch-icon" href="logo.jpg" />
+<script>
+  window.LOGO_EXTS = ['jpg','jpeg','png','webp','JPG','PNG'];
+  window.handleLogoError = function(el){
+    var idx = parseInt(el.getAttribute('data-logo-idx') || '0', 10) + 1;
+    if(idx < window.LOGO_EXTS.length){ el.setAttribute('data-logo-idx', idx); el.src = 'logo.' + window.LOGO_EXTS[idx]; }
+    else { el.onerror = null; el.style.display = 'none'; }
+  };
+</script>
+
+<!-- META (FACEBOOK) PIXEL -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '2009413933022449');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2009413933022449&ev=PageView&noscript=1" /></noscript>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme:{ extend:{ fontFamily:{ sans:['Hind Siliguri','sans-serif'] }, colors:{ primary:'#0D9488', secondary:'#10B981', accent:'#0F766E' } } } }
+</script>
+<style>
+  :root{ --primary:#0D9488; --secondary:#10B981; }
+  *{ font-family:'Hind Siliguri', sans-serif; }
+  body{ background:#F1F5F9; color:#0F172A; }
+  .brand-name{ font-weight:800; background:linear-gradient(90deg,#0D9488,#10B981,#EC4899,#0D9488); background-size:300% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:gradShift 5s linear infinite; display:inline-block; }
+  @keyframes gradShift{ to{ background-position:300% center; } }
+  .shimmer{ background:linear-gradient(90deg,rgba(15,23,42,.04) 25%,rgba(15,23,42,.09) 37%,rgba(15,23,42,.04) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; }
+  @keyframes shimmer{ 0%{background-position:100% 0} 100%{background-position:0 0} }
+  .wa-btn{ background:#22a559; color:#fff; box-shadow:0 8px 18px -8px rgba(34,165,89,.7); transition:transform .2s, filter .2s; }
+  .wa-btn:hover{ transform:translateY(-2px); filter:brightness(1.06); }
+  .wa-btn:active{ transform:translateY(0); }
+  .desc a{ color:#0D9488; text-decoration:underline; word-break:break-all; }
+  .topics-title{ border-left:3px solid #0D9488; padding-left:.75rem; }
+  .card-hover{ transition:transform .3s, box-shadow .3s; }
+  .card-hover:hover{ transform:translateY(-4px); box-shadow:0 18px 30px -12px rgba(15,23,42,.18); }
+  @media(prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+  <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-xl overflow-hidden bg-white shadow flex items-center justify-center p-0.5"><img src="logo.jpg" data-logo-idx="0" onerror="handleLogoError(this)" alt="alimixstore logo" class="w-full h-full object-contain" /></div>
+      <span class="brand-name text-base">alimixstore</span>
+    </a>
+    <a href="index.html#digital" class="text-xs font-semibold text-slate-600 hover:text-primary border border-slate-200 rounded-full px-4 py-2 bg-white">← সব প্রোডাক্ট</a>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 py-5">
+
+  <!-- Loading -->
+  <div id="loadingState">
+    <div class="shimmer rounded-2xl aspect-video mb-4"></div>
+    <div class="shimmer rounded-2xl h-32 mb-4"></div>
+    <div class="shimmer rounded-xl h-4 w-3/4 mb-2"></div>
+    <div class="shimmer rounded-xl h-4 w-1/2"></div>
+  </div>
+
+  <!-- Not found -->
+  <div id="notFoundState" class="hidden text-center py-20 bg-white rounded-3xl border border-slate-200">
+    <p class="text-5xl mb-3">😕</p>
+    <p class="font-bold text-slate-900 mb-1">প্রোডাক্টটি খুঁজে পাওয়া যায়নি</p>
+    <p class="text-sm text-slate-500 mb-5">প্রোডাক্টটি হয়তো সরিয়ে ফেলা হয়েছে বা লিংকটি ভুল।</p>
+    <a href="index.html#digital" class="inline-block text-white text-sm font-semibold px-6 py-3 rounded-xl" style="background:linear-gradient(120deg,#0D9488,#10B981)">সব প্রোডাক্ট দেখুন</a>
+  </div>
+
+  <!-- Product -->
+  <div id="productView" class="hidden">
+    <div id="pImageWrap" class="rounded-2xl overflow-hidden bg-gradient-to-br from-teal-50 to-sky-100 border border-slate-200 mb-4"></div>
+
+    <h1 id="pName" class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-1"></h1>
+    <p id="pCategory" class="text-xs font-semibold text-primary uppercase tracking-wider mb-3"></p>
+
+    <!-- Price card (matches reference) -->
+    <div class="border border-slate-300 bg-white rounded-2xl p-4 sm:p-5 mb-5">
+      <div class="flex items-center flex-wrap gap-2.5">
+        <span id="pPrice" class="text-3xl font-extrabold text-slate-900"></span>
+        <span id="pOld" class="hidden text-sm text-slate-400 line-through"></span>
+        <span id="pDiscBadge" class="hidden text-[11px] font-bold text-white bg-red-500 rounded-full px-2.5 py-1"></span>
+      </div>
+      <p id="pSave" class="hidden text-sm font-semibold text-green-700 mt-2"></p>
+      <a id="waOrderBtn" href="#" target="_blank" rel="noopener noreferrer" class="wa-btn mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm sm:text-base font-bold">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.47 3.45 1.29 4.9L2 22l5.32-1.39a9.87 9.87 0 004.72 1.2h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.83 14.1c-.25.71-1.45 1.35-2 1.44-.53.09-1.16.13-1.87-.12-.43-.15-.98-.32-1.69-.63-2.98-1.29-4.93-4.3-5.08-4.5-.15-.2-1.22-1.62-1.22-3.09 0-1.47.77-2.19 1.05-2.49.27-.3.6-.37.8-.37.2 0 .4 0 .58.01.19.01.44-.07.68.53.25.6.85 2.08.92 2.23.07.15.12.33.02.53-.1.2-.15.32-.3.49-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.38 1.47.3.15.47.13.65-.07.18-.2.75-.87.95-1.17.2-.3.4-.25.68-.15.28.1 1.77.84 2.08.99.3.15.5.22.57.35.08.13.08.75-.17 1.46z"/></svg>
+        WhatsApp-এ অর্ডার করুন
+      </a>
+      <p class="text-center text-[11px] text-slate-500 mt-2.5">📲 WhatsApp-এ মেসেজ করলেই অর্ডার প্রক্রিয়া শুরু হবে</p>
+    </div>
+
+    <!-- Details -->
+    <div id="pDetails" class="desc text-sm text-slate-700 leading-7 mb-6"></div>
+
+    <div id="pTopicsWrap" class="hidden mb-8">
+      <h2 id="pTopicsTitle" class="topics-title font-bold text-slate-900 mb-3 text-base"></h2>
+      <ul id="pTopics" class="list-disc pl-6 space-y-1 text-sm text-slate-700"></ul>
+    </div>
+
+    <!-- Related -->
+    <section id="relatedWrap" class="hidden mt-10">
+      <h2 class="text-base font-bold text-slate-900 mb-3">🛍️ আরও প্রোডাক্ট</h2>
+      <div id="relatedGrid" class="grid grid-cols-2 gap-3"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="mt-10 bg-slate-900 text-slate-400 text-center text-xs py-6 px-4">
+  &copy; <span id="year"></span> alimixstore — All rights reserved. <a href="index.html" class="text-teal-300 hover:underline ml-1">হোমে ফিরুন</a>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAa8YiG1P7rZoCg-enQ0E2HflfDY7JFPyQ",
+    authDomain: "alimixstoretopup.firebaseapp.com",
+    projectId: "alimixstoretopup",
+    storageBucket: "alimixstoretopup.firebasestorage.app",
+    messagingSenderId: "102854684850",
+    appId: "1:102854684850:web:c11f6ee301a29ffdc7d9ab",
+    measurementId: "G-V5C651KRFD"
+  };
+  const db = getFirestore(initializeApp(firebaseConfig));
+
+  const DEFAULT_WA = "8801948901917";
+  const $ = id => document.getElementById(id);
+  const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+  const track = (...a) => { try{ if(window.fbq) window.fbq(...a); }catch(e){} };
+  $('year').textContent = new Date().getFullYear();
+
+  // plain text -> safe HTML paragraphs with clickable links
+  function renderText(text){
+    return String(text||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).map(line=>{
+      const safe = esc(line).replace(/(https?:\/\/[^\s<]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
+      return `<p class="mb-3">${safe}</p>`;
+    }).join('');
+  }
+
+  const id = new URLSearchParams(location.search).get('id');
+
+  function showNotFound(){ $('loadingState').classList.add('hidden'); $('notFoundState').classList.remove('hidden'); }
+
+  async function load(){
+    if(!id) return showNotFound();
+    let p, cfg = {};
+    try{
+      const [snap, cfgSnap] = await Promise.all([ getDoc(doc(db,'products',id)), getDoc(doc(db,'settings','storeConfig')).catch(()=>null) ]);
+      if(!snap.exists()) return showNotFound();
+      p = { id:snap.id, ...snap.data() };
+      if(cfgSnap && cfgSnap.exists()) cfg = cfgSnap.data();
+    }catch(e){ console.error(e); return showNotFound(); }
+
+    const offer = Number(p.offerPrice)||0, orig = Number(p.originalPrice)||0;
+    const hasDisc = orig > offer && offer >= 0;
+    const pct = Number(p.discountPercent) || (hasDisc && orig ? Math.round((orig-offer)/orig*100) : 0);
+
+    document.title = `${p.name||'প্রোডাক্ট'} | alimixstore`;
+    $('metaDesc').setAttribute('content', (p.description || `${p.name} — alimixstore`).slice(0,155));
+
+    // image
+    const wrap = $('pImageWrap');
+    if(p.image){
+      wrap.innerHTML = `<img src="${esc(p.image)}" alt="${esc(p.name)}" class="w-full h-auto block" />`;
+      wrap.querySelector('img').addEventListener('error', ()=>{ wrap.innerHTML = '<div class="aspect-video flex items-center justify-center text-6xl">📦</div>'; });
+    }else{
+      wrap.innerHTML = '<div class="aspect-video flex items-center justify-center text-6xl">📦</div>';
+    }
+
+    $('pName').textContent = p.name || '';
+    $('pCategory').textContent = p.category || '';
+    $('pPrice').textContent = `৳ ${bn(offer)}`;
+    if(hasDisc){
+      $('pOld').textContent = `৳${bn(orig)}`; $('pOld').classList.remove('hidden');
+      if(pct){ $('pDiscBadge').textContent = `${bn(pct)}% ছাড়`; $('pDiscBadge').classList.remove('hidden'); }
+      $('pSave').textContent = `🎉 আপনি সাশ্রয় করছেন ৳ ${bn(orig-offer)}`; $('pSave').classList.remove('hidden');
+    }
+
+    // WhatsApp order
+    const wa = String(cfg.whatsappNumber || DEFAULT_WA).replace(/\D/g,'') || DEFAULT_WA;
+    const msg = `Hello alimixstore,\n\nআমি এই প্রোডাক্টটি অর্ডার করতে চাই।\n\nপ্রোডাক্ট: ${p.name}\nমূল্য: ৳${offer}\nলিংক: ${location.href}`;
+    $('waOrderBtn').href = `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`;
+    $('waOrderBtn').addEventListener('click', ()=>track('Lead',{ content_name:p.name, value:offer, currency:'BDT' }));
+
+    // details + topics
+    const detailsText = p.details || p.description || '';
+    $('pDetails').innerHTML = renderText(detailsText);
+    const topics = Array.isArray(p.topics) ? p.topics.filter(Boolean) : [];
+    if(topics.length){
+      $('pTopicsTitle').textContent = p.topicsTitle || 'যা যা পাবেন';
+      $('pTopics').innerHTML = topics.map(t=>`<li>${esc(t)}</li>`).join('');
+      $('pTopicsWrap').classList.remove('hidden');
+    }
+
+    $('loadingState').classList.add('hidden');
+    $('productView').classList.remove('hidden');
+    track('ViewContent',{ content_name:p.name, content_ids:[p.id], content_type:'product', value:offer, currency:'BDT' });
+
+    loadRelated(p.id);
+  }
+
+  async function loadRelated(currentId){
+    try{
+      const snap = await getDocs(query(collection(db,'products'), orderBy('createdAt','desc'), limit(9)));
+      const others = snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.id!==currentId).slice(0,4);
+      if(!others.length) return;
+      $('relatedGrid').innerHTML = others.map(x=>`
+        <a href="product.html?id=${encodeURIComponent(x.id)}" class="card-hover bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
+          <div class="aspect-video bg-gradient-to-br from-teal-50 to-sky-100 flex items-center justify-center overflow-hidden">${x.image ? `<img src="${esc(x.image)}" alt="${esc(x.name)}" loading="lazy" class="rel-img w-full h-full object-cover" />` : '<span class="text-3xl">📦</span>'}</div>
+          <div class="p-3"><p class="text-sm font-semibold text-slate-900 leading-snug" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(x.name)}</p><p class="text-base font-extrabold text-slate-900 mt-1">৳${esc(x.offerPrice||0)}</p></div>
+        </a>`).join('');
+      $('relatedGrid').querySelectorAll('.rel-img').forEach(img=>img.addEventListener('error',()=>{ const s=document.createElement('span'); s.className='text-3xl'; s.textContent='📦'; img.replaceWith(s); }));
+      $('relatedWrap').classList.remove('hidden');
+    }catch(e){ console.warn('Related products unavailable:', e.message); }
+  }
+
+  load();
+</script>
+</body>
+</html>
