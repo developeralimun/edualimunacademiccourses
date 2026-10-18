@@ -114,9 +114,7 @@ crud('t-posts','posts','পোস্ট (হোম কার্ড)',[
  {k:'desc',l:'ছোট বিবরণ (হোম কার্ডে)',t:'area',w:1},
  {k:'content',l:'বিস্তারিত বর্ণনা (পোস্ট খুললে দেখাবে)',t:'area',w:1},
  {k:'price',l:'মূল্য ৳ (প্ল্যান না থাকলে)',t:'number',when:['postType','product']},{k:'oldPrice',l:'আগের মূল্য ৳ (প্ল্যান না থাকলে)',t:'number',when:['postType','product']},
- {k:'m1Price',l:'⏳ 1 Month — মূল্য ৳',t:'number',when:['postType','product']},{k:'m1Old',l:'1 Month — আগের মূল্য ৳ (ঐচ্ছিক)',t:'number',when:['postType','product']},
- {k:'y1Price',l:'📅 1 Year — মূল্য ৳',t:'number',when:['postType','product']},{k:'y1Old',l:'1 Year — আগের মূল্য ৳ (ঐচ্ছিক)',t:'number',when:['postType','product']},
- {k:'ltPrice',l:'♾️ Lifetime — মূল্য ৳',t:'number',when:['postType','product']},{k:'ltOld',l:'Lifetime — আগের মূল্য ৳ (ঐচ্ছিক)',t:'number',when:['postType','product']},
+ {k:'variants',l:'⏳ অপশন ও মূল্য — প্রতি লাইনে একটা: Account Type | Duration | মূল্য | আগের মূল্য (ঐচ্ছিক)। কোনো একটা না লাগলে ওই ঘরে - দিন। খালি রাখলে উপরের সিঙ্গেল মূল্য কাজ করবে।',t:'area',w:1,p:'Shared | 1 Month | 299 | 399\nShared | 3 Months | 799\nPersonal | 1 Month | 2750\nPersonal | 1 Year | 9990 | 12999',when:['postType','product']},
  {k:'order',l:'ক্রম',t:'number',p:'1,2,3...'},{k:'badge',l:'ব্যাজ (Hot/New)'},
  {k:'image',l:'ছবির লিংক (ঐচ্ছিক)',w:1},
  {k:'accountType',l:'অ্যাকাউন্ট টাইপ',t:'sel',when:['postType','package'],o:[['tiktok','TikTok (Username চাইবে)'],['facebook','Facebook (ID / Page লিংক চাইবে)'],['other','Other']]},
@@ -126,7 +124,7 @@ crud('t-posts','posts','পোস্ট (হোম কার্ড)',[
  {k:'accountPlaceholder',l:'ইনপুট প্লেসহোল্ডার (খালি = অটো)',when:['postType','package'],p:'@username'},
  {k:'source',l:'প্যাকেজের উৎস',t:'sel',when:['postType','package'],o:[['packages','নতুন সিস্টেম'],['coinPackages','আগের TikTok Coin ডেটা'],['starPackages','আগের Facebook Star ডেটা']]},
  {k:'active',l:'হোমে দেখাবে',t:'check'}],
- p=>`<b>${p.postType==='product'?'🛍️':'📦'} ${p.active===false?'🚫 ':''}${esc(p.title)}</b><small>${p.postType==='product'?'সাধারণ পোস্ট'+(([['1M',p.m1Price],['1Y',p.y1Price],['LT',p.ltPrice]].filter(x=>+x[1]>0).map(x=>' · '+x[0]+' ৳'+x[1]).join(''))||(p.price?' · ৳'+p.price:'')):esc(p.accountType||'')+' · '+esc(p.source||'packages')} · ক্রম ${p.order||'-'}</small>`,
+ p=>`<b>${p.postType==='product'?'🛍️':'📦'} ${p.active===false?'🚫 ':''}${esc(p.title)}</b><small>${p.postType==='product'?'সাধারণ পোস্ট'+(p.variants&&p.variants.trim()?' · '+p.variants.trim().split('\n').length+'টি অপশন':(p.price?' · ৳'+p.price:'')):esc(p.accountType||'')+' · '+esc(p.source||'packages')} · ক্রম ${p.order||'-'}</small>`,
  {fix:d=>{if(!d.order)d.order=Date.now()}});
 
 crud('t-pkgs','packages','প্যাকেজ',[
