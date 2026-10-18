@@ -111,7 +111,7 @@ crud('t-posts','posts','পোস্ট (হোম কার্ড)',[
  {k:'postType',l:'পোস্টের ধরন *',t:'sel',w:1,o:[['package','📦 প্যাকেজ পোস্ট (TikTok Coin / Facebook Star) — ৩ ধাপের অর্ডার ফর্ম'],['product','🛍️ সাধারণ পোস্ট (TikTok Boost / Facebook Boost / অন্য কিছু) — বিস্তারিত + WhatsApp অর্ডার']]},
  {k:'title',l:'টাইটেল *',req:1,w:1,p:'যেমনঃ TikTok Coin / Facebook Boost'},
  {k:'desc',l:'ছোট বিবরণ (হোম কার্ডে)',t:'area',w:1},
- {k:'content',l:'বিস্তারিত বর্ণনা (পোস্ট খুললে দেখাবে)',t:'area',w:1},
+ {k:'content',l:'বিস্তারিত বর্ণনা (পোস্ট খুললে দেখাবে) — ## দিয়ে শিরোনাম, - দিয়ে বুলেট, লিংক অটো ক্লিকযোগ্য',t:'area',w:1},
  {k:'price',l:'মূল্য ৳ (প্ল্যান না থাকলে)',t:'number',when:['postType','product']},{k:'oldPrice',l:'আগের মূল্য ৳ (প্ল্যান না থাকলে)',t:'number',when:['postType','product']},
  {k:'variants',l:'⏳ অপশন ও মূল্য — প্রতি লাইনে একটা: Account Type | Duration | মূল্য | আগের মূল্য (ঐচ্ছিক)। কোনো একটা না লাগলে ওই ঘরে - দিন। খালি রাখলে উপরের সিঙ্গেল মূল্য কাজ করবে।',t:'area',w:1,p:'Shared | 1 Month | 299 | 399\nShared | 3 Months | 799\nPersonal | 1 Month | 2750\nPersonal | 1 Year | 9990 | 12999',when:['postType','product']},
  {k:'order',l:'ক্রম',t:'number',p:'1,2,3...'},{k:'badge',l:'ব্যাজ (Hot/New)'},
@@ -145,7 +145,8 @@ crud('t-reviews','reviews','রিভিউ',[
 
 crud('t-prods','products','ডিজিটাল প্রোডাক্ট',[
  {k:'name',l:'নাম *',req:1,w:1},{k:'category',l:'ক্যাটাগরি',p:'Boost, Topup...'},{k:'badge',l:'ব্যাজ'},
- {k:'description',l:'বিবরণ',t:'area',w:1},{k:'image',l:'ছবির লিংক',w:1},
+ {k:'description',l:'ছোট বিবরণ (কার্ডে ও পেজের উপরে দেখাবে)',t:'area',w:1},
+ {k:'content',l:'বিস্তারিত বর্ণনা (পেজ খুললে WhatsApp বাটনের নিচে দেখাবে) — ## দিয়ে শিরোনাম, - দিয়ে বুলেট, লিংক অটো ক্লিকযোগ্য',t:'area',w:1,p:'## কোর্সের টপিক\n- বাংলা মডেল টেস্ট\n- গণিত মডেল টেস্ট\n\nবিস্তারিত লিখুন... https://example.com'},{k:'image',l:'ছবির লিংক',w:1},
  {k:'variants',l:'⏳ অপশন ও মূল্য — প্রতি লাইনে একটা: Account Type | Duration | মূল্য | আগের মূল্য (ঐচ্ছিক)। কোনো একটা না লাগলে ওই ঘরে - দিন। খালি রাখলে নিচের সিঙ্গেল মূল্য কাজ করবে।',t:'area',w:1,p:'Shared | 1 Month | 299 | 399\nShared | 3 Months | 799\nPersonal | 1 Month | 2750\nPersonal | 1 Year | 9990 | 12999'},
  {k:'originalPrice',l:'মূল মূল্য ৳ (অপশন না থাকলে)',t:'number'},{k:'offerPrice',l:'অফার মূল্য ৳ (অপশন না থাকলে *)',t:'number'},
  {k:'discountPercent',l:'ছাড় % (খালি = অটো)',t:'number'},{k:'productLink',l:'প্রোডাক্ট লিংক'},
