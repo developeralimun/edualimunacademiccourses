@@ -8,31 +8,30 @@
 <script>tailwind.config={theme:{extend:{colors:{primary:'#0D9488'}}}}</script>
 <style>
 *{font-family:'Hind Siliguri',sans-serif}body{background:#F1F5F9;color:#0F172A}
-.card{background:#fff;border:1px solid #E2E8F0}
-.btn{background:linear-gradient(120deg,#0D9488,#10B981);color:#fff}
+.card{background:#fff;border:1px solid #E2E8F0}.btn{background:linear-gradient(120deg,#0D9488,#10B981);color:#fff}.btn:disabled{opacity:.5}
 .hov{transition:.3s}.hov:hover{transform:translateY(-4px);box-shadow:0 18px 30px -12px rgba(15,23,42,.18)}
 .brand{font-weight:800;background:linear-gradient(90deg,#0D9488,#10B981,#EC4899,#0D9488);background-size:300% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.in{width:100%;background:#F8FAFC;border:1px solid #dbe4ee;border-radius:.75rem;padding:.7rem 1rem;font-size:.875rem;margin-bottom:.75rem}.in:focus{outline:none;border-color:#14b8a6}
+.pkg{border:1.5px solid #fca5a5;border-radius:14px;background:#fff;padding:14px 6px;text-align:center;box-shadow:0 3px 7px rgba(15,23,42,.1);transition:.2s}
+.pkg:hover{transform:translateY(-2px);border-color:#ef4444}.pkg.star{border-color:#93c5fd}.pkg.star .pill{background:linear-gradient(135deg,#3b8bff,#0b57c9)}
+.pk-icon{width:40px;height:40px;margin:0 auto 4px}.pk-icon svg{width:100%;height:100%}
+.pill{display:inline-block;margin-top:6px;padding:3px 14px;border-radius:999px;font-size:14px;font-weight:900;color:#fff;background:linear-gradient(135deg,#ef233c,#b91c1c)}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
 .pcard{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #e2e8f0;transition:transform .22s,box-shadow .22s;display:flex;flex-direction:column}
 .pcard:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(13,148,136,.13)}
 .pimg{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#ccfbf1,#e0f2fe);display:flex;align-items:center;justify-content:center;font-size:2.8rem;position:relative;overflow:hidden}
 .pimg img{width:100%;height:100%;object-fit:cover}
-.pbadge{position:absolute;top:10px;left:10px;background:#0d9488;color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase}
-.pbody{padding:16px;flex:1;display:flex;flex-direction:column}
-.pcat{font-size:.72rem;color:#0d9488;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
-.ptitle{font-size:.98rem;font-weight:700;color:#1e293b;margin-bottom:6px;line-height:1.4}
-.pdesc{font-size:.82rem;color:#64748b;line-height:1.55;flex:1;margin-bottom:14px}
-.pfoot{display:flex;align-items:center;justify-content:space-between}
-.pprice{font-size:1.25rem;font-weight:800;color:#1e293b}.pprice .old{text-decoration:line-through;color:#64748b;font-size:.8rem;font-weight:400;margin-left:6px}
-.pbuy{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:700;white-space:nowrap;transition:.2s}
-.pcard:hover .pbuy{transform:scale(1.04);box-shadow:0 4px 12px rgba(13,148,136,.35)}
-.chip{padding:7px 16px;border:1.5px solid #E2E8F0;background:#fff;border-radius:999px;font-size:13px;font-weight:600;color:#64748b;white-space:nowrap}
-.chip.on,.chip:hover{background:#0D9488;border-color:#0D9488;color:#fff}
-@media(max-width:640px){.pgrid{grid-template-columns:repeat(2,1fr);gap:12px}.pbody{padding:10px}.ptitle{font-size:.85rem;margin-bottom:4px}.pdesc{font-size:.72rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}.pfoot{flex-direction:column;align-items:flex-start;gap:8px}.pprice{font-size:1rem}.pbuy{width:100%;text-align:center;padding:8px 12px;font-size:.78rem}}
+.pbadge{position:absolute;top:10px;left:10px;background:#0d9488;color:#fff;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase}
+.pbody{padding:16px;flex:1;display:flex;flex-direction:column}.pcat{font-size:.72rem;color:#0d9488;font-weight:600;text-transform:uppercase;margin-bottom:5px}
+.ptitle{font-size:.98rem;font-weight:700;color:#1e293b;margin-bottom:6px}.pdesc{font-size:.82rem;color:#64748b;flex:1;margin-bottom:14px}
+.pfoot{display:flex;align-items:center;justify-content:space-between}.pprice{font-size:1.25rem;font-weight:800}.pprice .old{text-decoration:line-through;color:#64748b;font-size:.8rem;font-weight:400;margin-left:6px}
+.pbuy{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:700;white-space:nowrap}
+.chip{padding:7px 16px;border:1.5px solid #E2E8F0;background:#fff;border-radius:999px;font-size:13px;font-weight:600;color:#64748b;white-space:nowrap}.chip.on,.chip:hover{background:#0D9488;border-color:#0D9488;color:#fff}
+@media(max-width:640px){.pgrid{grid-template-columns:repeat(2,1fr);gap:12px}.pbody{padding:10px}.ptitle{font-size:.85rem}.pdesc{font-size:.72rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pfoot{flex-direction:column;align-items:flex-start;gap:8px}.pbuy{width:100%;text-align:center}}
 </style></head>
 <body>
-<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
  <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
   <a href="#top" class="flex items-center gap-2"><img src="logo.jpg" class="w-10 h-10 rounded-xl object-contain" alt="logo" onerror="this.style.display='none'"><span class="brand text-lg">alimixstore</span></a>
   <nav class="hidden md:flex gap-5 text-xs font-semibold text-slate-600"><a href="#purchase">Digital Purchase</a><a href="#digital">Digital Product</a></nav>
@@ -42,7 +41,7 @@
 
 <main id="top" class="max-w-7xl mx-auto px-4 py-6 space-y-12">
  <h1 class="text-2xl sm:text-3xl font-extrabold">TikTok Coin, Facebook Star, Boosting &amp; Digital Products</h1>
- <div id="postSections" class="space-y-12"></div>
+ <section id="purchase" class="scroll-mt-20"><h2 class="text-xl sm:text-2xl font-extrabold mb-4">🛒 Digital Purchase</h2><div id="postGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"></div></section>
 
  <section id="digital" class="scroll-mt-20">
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
@@ -62,42 +61,136 @@
  <p class="mt-4">&copy; <span id="yr"></span> alimixstore</p>
 </footer>
 
+<!-- ===== প্যাকেজ ভিউ (আগের pkg.html এখন এখানেই) ===== -->
+<div id="pv" class="hidden fixed inset-0 z-40 bg-slate-100 overflow-y-auto">
+ <header class="bg-white border-b border-slate-200"><div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+  <span class="font-extrabold text-primary">alimixstore</span><button id="pvBack" class="text-xs font-semibold border border-slate-200 rounded-full px-4 py-2">← হোম</button></div></header>
+ <div class="max-w-3xl mx-auto px-4 py-6"><div class="card rounded-3xl overflow-hidden shadow-sm">
+  <div class="flex items-center gap-4 p-5 sm:p-6" style="background:linear-gradient(135deg,#0F172A,#1e3a5f)">
+   <div id="hImg" class="hidden w-16 h-16 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 bg-white"><img id="hImgTag" alt="" class="w-full h-full object-cover"></div>
+   <div><h1 id="title" class="text-lg sm:text-2xl font-bold text-white"></h1><p id="desc" class="text-xs sm:text-sm text-slate-300 mt-1"></p></div></div>
+  <div class="p-5 sm:p-6">
+   <p class="text-xs text-red-500 font-semibold bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-5">অর্ডার করার পর অর্ডারের স্ক্রিনশট টেলিগ্রাম/হোয়াটসঅ্যাপে দিবেন, তারপর অর্ডার কনফার্ম করা হবে।</p>
+   <p class="text-xs font-extrabold mb-3">✦ PREMIUM PACKAGES — প্যাকেজ নির্বাচন করুন</p>
+   <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+   <p id="empty" class="hidden text-center text-sm text-slate-400 py-8">এখনো কোনো প্যাকেজ নেই।</p>
+  </div></div></div>
+</div>
+
+<!-- ===== অর্ডার মডাল ===== -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+ <div class="card rounded-3xl w-full max-w-md max-h-[92vh] overflow-y-auto p-5">
+  <div class="flex justify-between items-start mb-3"><h3 id="mName" class="font-bold text-lg"></h3><button id="mClose" class="w-8 h-8 rounded-full bg-slate-100">✕</button></div>
+  <div id="form">
+   <label id="accLbl" class="text-xs font-semibold block mb-1"></label><input id="acc" class="in"/>
+   <label class="text-xs font-semibold block mb-1">আপনার নাম *</label><input id="nm" class="in"/>
+   <label class="text-xs font-semibold block mb-1">WhatsApp নাম্বার *</label><input id="ph" type="tel" class="in" placeholder="01XXXXXXXXX"/>
+   <label class="text-xs font-semibold block mb-1">কুপন কোড (ঐচ্ছিক)</label>
+   <div class="flex gap-2"><input id="cp" class="in flex-1"/><button id="cpBtn" type="button" class="btn px-4 rounded-xl text-xs font-semibold mb-3">এপ্লাই</button></div>
+   <p id="cpMsg" class="hidden text-xs mb-3"></p>
+   <label class="text-xs font-semibold block mb-1">পেমেন্ট মেথড *</label>
+   <select id="pm" class="in"><option value="bkash">bKash</option><option value="nagad">Nagad</option><option value="rocket">Rocket</option></select>
+   <div class="bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 mb-3 text-sm">
+    <p>পরিশোধযোগ্য: <b id="total"></b></p><p>সেন্ডমানি (<span id="pmL"></span>): <b id="sn" class="text-primary"></b> <button id="cpy" type="button" class="text-[11px] text-primary underline ml-1">কপি</button></p></div>
+   <p id="rule" class="text-[11.5px] bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 mb-3"></p>
+   <label class="text-xs font-semibold block mb-1">যে নাম্বার থেকে পাঠিয়েছেন *</label><input id="pn" type="tel" class="in"/>
+   <label class="text-xs font-semibold block mb-1">Transaction ID *</label><input id="tx" class="in"/>
+   <p id="err" class="hidden text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-3"></p>
+   <button id="sub" class="btn w-full py-3 rounded-xl text-sm font-semibold">অর্ডার জমা দিন</button>
+  </div>
+  <div id="done" class="hidden text-center py-4"><p class="text-4xl mb-2">🧾</p><p class="font-bold">অর্ডার জমা হয়েছে!</p>
+   <p class="text-xs text-slate-500 my-2">Order ID: <b id="oid"></b></p>
+   <a id="waDone" target="_blank" class="block btn py-3 rounded-xl text-sm font-semibold mt-3">💬 WhatsApp-এ জানান</a></div>
+ </div>
+</div>
+
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,collection,doc,onSnapshot,query,orderBy} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,serverTimestamp,query,orderBy} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const db=getFirestore(initializeApp({apiKey:"AIzaSyAa8YiG1P7rZoCg-enQ0E2HflfDY7JFPyQ",authDomain:"alimixstoretopup.firebaseapp.com",projectId:"alimixstoretopup",storageBucket:"alimixstoretopup.firebasestorage.app",messagingSenderId:"102854684850",appId:"1:102854684850:web:c11f6ee301a29ffdc7d9ab"}));
 const $=id=>document.getElementById(id);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('yr').textContent=new Date().getFullYear();
-// সেকশনের নাম ও ক্রম (অ্যাডমিন থেকে পোস্টে section বেছে নিলে এখানে দেখাবে)
-const SECTIONS={purchase:'🛒 Digital Purchase'};
-let POSTS=[],PRODUCTS=[],term='',dpFilter='all';
-onSnapshot(doc(db,'settings','storeConfig'),s=>{const n=String((s.exists()&&s.data().whatsappNumber)||'8801948901917').replace(/\D/g,'');$('waTop').href=$('waFoot').href='https://wa.me/'+n;});
+let CFG={},POSTS=[],PRODUCTS=[],PKGS=[],POST=null,cur=null,disc=0,code='',busy=false,unsubPkg=null,term='',dpFilter='all';
 
+/* ---------- Settings ---------- */
+onSnapshot(doc(db,'settings','storeConfig'),s=>{CFG=s.exists()?s.data():{};
+ const n=String(CFG.whatsappNumber||'8801948901917').replace(/\D/g,'');$('waTop').href=$('waFoot').href='https://wa.me/'+n;pay()});
+
+/* ---------- Posts (হোম কার্ড) ---------- */
+onSnapshot(collection(db,'posts'),s=>{POSTS=s.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.active!==false).sort((a,b)=>(a.order||0)-(b.order||0));renderPosts();route()});
 function renderPosts(){
- const by=POSTS.length?{purchase:[...POSTS]}:{};
- const keys=[...Object.keys(SECTIONS).filter(k=>by[k]),...Object.keys(by).filter(k=>!SECTIONS[k])];
- $('postSections').innerHTML=keys.map(k=>{
-  const list=by[k].sort((a,b)=>(a.order||0)-(b.order||0));
-  return `<section id="${esc(k)}" class="scroll-mt-20"><h2 class="text-xl sm:text-2xl font-extrabold mb-4">${esc(SECTIONS[k]||k)}</h2>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">${list.map(p=>`
-   <a href="pkg.html?id=${encodeURIComponent(p.id)}" class="card hov rounded-2xl overflow-hidden flex flex-col">
-    ${p.image?`<div class="aspect-video bg-slate-100"><img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover"></div>`:''}
-    <div class="p-4 flex flex-col flex-1">
-     ${p.badge?`<span class="self-start text-[10px] font-bold text-white px-2 py-0.5 rounded-full mb-2 btn">${esc(p.badge)}</span>`:''}
-     <h3 class="font-bold text-base leading-snug mb-1">${esc(p.title)}</h3>
-     <p class="text-xs text-slate-500 clamp2 flex-1 mb-3">${esc(p.desc||'')}</p>
-     <span class="btn text-center text-xs font-semibold py-2.5 rounded-xl">প্যাকেজ দেখুন →</span>
-    </div></a>`).join('')}</div></section>`;
- }).join('');
+ $('purchase').classList.toggle('hidden',!POSTS.length);
+ $('postGrid').innerHTML=POSTS.map(p=>`<a href="#p=${encodeURIComponent(p.id)}" class="card hov rounded-2xl overflow-hidden flex flex-col">
+  ${p.image?`<div class="aspect-video bg-slate-100"><img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover"></div>`:''}
+  <div class="p-4 flex flex-col flex-1">${p.badge?`<span class="self-start text-[10px] font-bold text-white px-2 py-0.5 rounded-full mb-2 btn">${esc(p.badge)}</span>`:''}
+   <h3 class="font-bold text-base leading-snug mb-1">${esc(p.title)}</h3><p class="text-xs text-slate-500 clamp2 flex-1 mb-3">${esc(p.desc||'')}</p>
+   <span class="btn text-center text-xs font-semibold py-2.5 rounded-xl">প্যাকেজ দেখুন →</span></div></a>`).join('');
 }
+
+/* ---------- Package view (#p=ID) ---------- */
+const coinSvg=i=>`<svg viewBox="0 0 48 48"><defs><radialGradient id="c${i}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFF3C4"/><stop offset=".45" stop-color="#FFD452"/><stop offset="1" stop-color="#E8960C"/></radialGradient></defs><circle cx="24" cy="24" r="21" fill="url(#c${i})" stroke="#B4740A" stroke-width="1.5"/><circle cx="24" cy="24" r="16.5" fill="none" stroke="#fffdf0" stroke-width="1.4" stroke-dasharray="2.6 3.4"/><text x="24" y="31" text-anchor="middle" font-size="19" font-weight="800" fill="#9A5B00">♪</text></svg>`;
+const starSvg=i=>`<svg viewBox="0 0 48 48"><defs><linearGradient id="s${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE27A"/><stop offset=".55" stop-color="#FBBF24"/><stop offset="1" stop-color="#E8960C"/></linearGradient></defs><path d="M24 4l5.8 12 13.2 1.9-9.6 9.3 2.3 13.1L24 34l-11.7 6.3 2.3-13.1L5 17.9 18.2 16z" fill="url(#s${i})" stroke="#B4740A" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+let shownId=null;
+function route(){
+ const m=location.hash.match(/^#p=(.+)$/),id=m?decodeURIComponent(m[1]):null;
+ if(!id){$('pv').classList.add('hidden');document.body.style.overflow='';shownId=null;if(unsubPkg){unsubPkg();unsubPkg=null}return}
+ const p=POSTS.find(x=>x.id===id);if(!p)return;
+ document.body.style.overflow='hidden';$('pv').classList.remove('hidden');$('pv').scrollTop=0;
+ POST=p;$('title').textContent=p.title;$('desc').textContent=p.desc||'';
+ $('hImg').classList.toggle('hidden',!p.image);if(p.image)$('hImgTag').src=p.image;
+ if(shownId===id)return;shownId=id;if(unsubPkg)unsubPkg();
+ const src=p.source||'packages';
+ unsubPkg=onSnapshot(collection(db,src),sn=>{
+  PKGS=sn.docs.map(d=>{const x=d.data();return{id:d.id,label:x.label||(x.coins?x.coins+' Coins':x.stars?x.stars+' Stars':''),price:+x.price||0,oldPrice:+x.oldPrice||0,order:x.coins||x.stars||x.order||0,couponCode:x.couponCode||'',couponDiscount:+x.couponDiscount||0,postId:x.postId}}).filter(x=>x.label&&(src!=='packages'||x.postId===id)).sort((a,b)=>a.order-b.order);
+  $('empty').classList.toggle('hidden',PKGS.length>0);
+  const ic=p.icon||(p.accountType==='facebook'?'star':'coin');
+  $('grid').innerHTML=PKGS.map((k,i)=>`<button data-i="${i}" class="pkg ${ic==='star'?'star':''}">${ic==='none'?'':`<span class="pk-icon block">${ic==='star'?starSvg(i):coinSvg(i)}</span>`}<p class="font-extrabold text-base">${esc(k.label)}</p>${k.oldPrice>k.price?`<p class="text-[11px] text-slate-400 line-through">৳${k.oldPrice}</p>`:''}<span class="pill">৳${k.price}</span></button>`).join('');
+ });
+}
+addEventListener('hashchange',route);
+$('pvBack').onclick=()=>{location.hash=''};
+
+/* ---------- Order modal ---------- */
+const RULES={bkash:"নিজস্ব bKash পারসোনাল নাম্বার থেকে সেন্ডমানি করুন। ৫০০ টাকার বেশি হলে হাজারে ১৫ টাকা ক্যাশআউট চার্জ প্রযোজ্য। থার্ডপার্টি সিম/মার্চেন্ট থেকে পাঠাবেন না।",nagad:"নগদে সেন্ডমানি করুন, ক্যাশআউট/মার্চেন্ট নয়। নিজস্ব নাম্বার থেকে পাঠান।",rocket:"রকেটে সেন্ডমানি করুন, ক্যাশআউট/মার্চেন্ট নয়। নিজস্ব নাম্বার থেকে পাঠান।"};
+const LBL={bkash:'bKash',nagad:'Nagad',rocket:'Rocket'};
+const phone=v=>{v=String(v||'').replace(/[\s-]/g,'');if(/^01\d{9}$/.test(v))return'+88'+v;if(/^8801\d{9}$/.test(v))return'+'+v;if(/^\+8801\d{9}$/.test(v))return v;return''};
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.pkg');if(!b)return;cur=PKGS[+b.dataset.i];disc=0;code='';
+ $('mName').textContent=`${POST.title} — ${cur.label}`;$('accLbl').textContent=POST.accountLabel||'TikTok Username@ *';
+ ['acc','nm','ph','cp','pn','tx'].forEach(i=>$(i).value='');$('cpMsg').classList.add('hidden');$('err').classList.add('hidden');
+ $('form').classList.remove('hidden');$('done').classList.add('hidden');pay();$('modal').classList.remove('hidden')});
+$('mClose').onclick=()=>$('modal').classList.add('hidden');
+function pay(){if(!cur)return;const m=$('pm').value;$('pmL').textContent=LBL[m];
+ $('sn').textContent=CFG[m+'Number']||'শীঘ্রই যোগ হবে';$('rule').textContent='⚠️ '+(CFG[m+'Rule']||RULES[m]);$('total').textContent='৳'+Math.max(cur.price-disc,0)}
+$('pm').onchange=pay;
+$('cpy').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText($('sn').textContent);
+$('cpBtn').onclick=()=>{const v=$('cp').value.trim().toUpperCase(),m=$('cpMsg');m.classList.remove('hidden');
+ if(cur.couponCode&&v===cur.couponCode.toUpperCase()){code=cur.couponCode;disc=Math.min(cur.couponDiscount,cur.price);m.textContent=`কুপন প্রয়োগ হয়েছে! ৳${disc} ছাড়।`;m.className='text-xs mb-3 text-emerald-600'}
+ else{code='';disc=0;m.textContent='কুপন সঠিক নয় বা এই প্যাকেজে প্রযোজ্য নয়।';m.className='text-xs mb-3 text-red-500'}pay()};
+$('sub').onclick=async()=>{
+ if(busy)return;const fail=m=>{$('err').textContent=m;$('err').classList.remove('hidden')};
+ const acc=$('acc').value.trim(),nm=$('nm').value.trim(),ph=phone($('ph').value),pn=phone($('pn').value),tx=$('tx').value.trim().replace(/\s+/g,'');
+ if(acc.length<2)return fail('অ্যাকাউন্ট/লিংক দিন।');if(nm.length<2)return fail('নাম দিন।');if(!ph)return fail('সঠিক WhatsApp নাম্বার দিন।');
+ if(!pn)return fail('পেমেন্ট নাম্বার দিন।');if(tx.length<5)return fail('সঠিক Transaction ID দিন।');
+ busy=true;$('sub').disabled=true;$('err').classList.add('hidden');
+ try{
+  const fin=Math.max(cur.price-disc,0),m=$('pm').value;
+  const o={productId:cur.id,productType:'package',productName:`${POST.title} — ${cur.label}`,originalPrice:cur.price,offerPrice:fin,coinPackagePrice:cur.price,couponApplied:!!code&&disc>0,couponCode:code,couponDiscount:disc,accountType:POST.accountType||'tiktok',accountIdentifier:acc,customerName:nm,customerPhone:ph,paymentMethod:m,paymentNumber:pn,transactionId:tx,status:'pending',createdAt:serverTimestamp()};
+  const r=await addDoc(collection(db,'orders'),o);const sid=r.id.slice(0,8).toUpperCase();
+  const t=String(CFG.telegramBotToken||'').trim(),c=String(CFG.telegramChatId||'').trim();
+  if(t&&c)fetch(`https://api.telegram.org/bot${encodeURIComponent(t)}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:c,text:`🛒 নতুন অর্ডার\nID: ${sid}\n${o.productName}\n৳${fin}${code?` (কুপন ${code})`:''}\n${acc}\n${ph}\n${LBL[m]} ${pn}\nTxn: ${tx}`})}).catch(()=>{});
+  $('oid').textContent=sid;$('waDone').href=`https://wa.me/${String(CFG.whatsappNumber||'8801948901917').replace(/\D/g,'')}?text=${encodeURIComponent(`Hello alimixstore, অর্ডার করেছি।\nID: ${sid}\n${o.productName}\nমূল্য: ৳${fin}\nTxn: ${tx}`)}`;
+  $('form').classList.add('hidden');$('done').classList.remove('hidden');
+ }catch(e){console.error(e);fail('অর্ডার জমা হয়নি, আবার চেষ্টা করুন।')}
+ busy=false;$('sub').disabled=false};
+
+/* ---------- Digital Products ---------- */
 function renderDigital(){
  const cats=[...new Set(PRODUCTS.map(p=>(p.category||'').trim()).filter(Boolean))];
  if(dpFilter!=='all'&&!cats.includes(dpFilter))dpFilter='all';
  $('dpChips').innerHTML=cats.length?[`<button class="chip ${dpFilter==='all'?'on':''}" data-c="all">সব</button>`,...cats.map(c=>`<button class="chip ${dpFilter===c?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`)].join(''):'';
- let l=PRODUCTS.filter(p=>(dpFilter==='all'||(p.category||'').trim()===dpFilter)&&(!term||(p.name||'').toLowerCase().includes(term)||(p.description||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term))).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+ const l=PRODUCTS.filter(p=>(dpFilter==='all'||(p.category||'').trim()===dpFilter)&&(!term||(p.name||'').toLowerCase().includes(term)||(p.description||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term))).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
  $('dpEmpty').classList.toggle('hidden',l.length>0);$('dpCount').textContent=l.length+'টি প্রোডাক্ট';
- // কার্ডে ক্লিক বা Buy Now চাপলে product.html খুলবে, সেখানে WhatsApp-এ অর্ডার বাটন আছে
  $('dpGrid').innerHTML=l.map(p=>{const bd=p.badge||(p.discountPercent?`-${p.discountPercent}%`:'');return `<a href="product.html?id=${encodeURIComponent(p.id)}" class="pcard">
   <div class="pimg">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">`:'📦'}${bd?`<div class="pbadge">${esc(bd)}</div>`:''}</div>
   <div class="pbody"><div class="pcat">${esc(p.category||'Digital')}</div><div class="ptitle">${esc(p.name)}</div><div class="pdesc">${esc(p.description||'')}</div>
@@ -105,6 +198,5 @@ function renderDigital(){
 }
 $('dpChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;dpFilter=b.dataset.c;renderDigital()});
 $('dpSearch').addEventListener('input',e=>{term=e.target.value.trim().toLowerCase();renderDigital()});
-onSnapshot(collection(db,'posts'),s=>{POSTS=s.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.active!==false);renderPosts()});
 onSnapshot(query(collection(db,'products'),orderBy('createdAt','desc')),s=>{PRODUCTS=s.docs.map(d=>({id:d.id,...d.data()}));renderDigital()});
 </script></body></html>
