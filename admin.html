@@ -21,6 +21,7 @@ input[type=checkbox]{width:auto}textarea{min-height:70px}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}
 .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}.stat div{background:#0a2036;border:1px solid var(--line);border-radius:12px;padding:12px}.stat b{display:block;font-size:20px;color:var(--g)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#132e43;border:1px solid var(--g);padding:10px 20px;border-radius:99px;font-size:14px;z-index:9}
+.sec{grid-column:1/-1;margin:6px 0 0;padding:8px 12px;border-radius:9px;background:#0a2036;border:1px dashed var(--g);color:var(--g);font-size:13px;font-weight:600}
 @media(max-width:600px){.fg{grid-template-columns:1fr}.it{flex-direction:column;align-items:flex-start}}
 </style></head><body><div class="wrap">
 
@@ -82,8 +83,9 @@ function crud(root,col,title,fields,label,o={}){
   :f.t==='sel'?`<select id="${id(f.k)}"></select>`
   :f.t==='check'?`<input type="checkbox" id="${id(f.k)}">`
   :`<input id="${id(f.k)}" type="${f.t||'text'}" placeholder="${f.p||''}">`;
- el.innerHTML=`<div class="g"><h3 id="${id('h')}" style="margin-top:0"></h3><div class="fg">${fields.map(f=>`<div class="${f.w?'w':''}" id="${id(f.k)}_w"><label ${f.t==='check'?'class="ck"':''}>${f.t==='check'?inp(f)+f.l:f.l+'</label>'+inp(f)}${f.t==='check'?'</label>':''}</div>`).join('')}</div>
+ el.innerHTML=`<div class="g"><h3 id="${id('h')}" style="margin-top:0"></h3><div class="fg">${fields.map(f=>f.t==='sec'?`<div class="sec">${f.l}</div>`:`<div class="${f.w?'w':''}" id="${id(f.k)}_w"><label ${f.t==='check'?'class="ck"':''}>${f.t==='check'?inp(f)+f.l:f.l+'</label>'+inp(f)}${f.t==='check'?'</label>':''}</div>`).join('')}</div>
   <div class="r"><button class="b" id="${id('s')}">সংরক্ষণ</button><button class="n" id="${id('n')}">নতুন / ক্লিয়ার</button></div></div><div id="${id('l')}"></div>`;
+ fields=fields.filter(f=>f.t!=='sec');
  function applyWhen(){fields.forEach(f=>{if(f.when){$(id(f.k)+'_w').classList.toggle('hid',$(id(f.when[0])).value!==f.when[1])}})}
  el.addEventListener('change',applyWhen);
  const reset=()=>{eid='';$(id('h')).textContent='➕ নতুন '+title;fields.forEach(f=>{const x=$(id(f.k));
@@ -101,8 +103,7 @@ function crud(root,col,title,fields,label,o={}){
   for(const f of fields){const v=$(id(f.k));let val=f.t==='check'?v.checked:v.value.trim();
    if(f.t==='number')val=+val||0;if(f.up)val=String(val).toUpperCase();
    if(f.req&&!val)return alert(f.l+' দিন');d[f.k]=val}
-  if(o.fix)o.fix(d);
-  try{if(eid)await updateDoc(doc(db,col,eid),d);else await addDoc(collection(db,col),{...d,...(o.add||{})});toast('সংরক্ষণ হয়েছে ✓');reset()}catch(e){alert('ব্যর্থ: '+e.message)}};
+  try{if(o.fix)o.fix(d);if(eid)await updateDoc(doc(db,col,eid),d);else await addDoc(collection(db,col),{...d,...(o.add||{})});toast('সংরক্ষণ হয়েছে ✓');reset()}catch(e){alert('ব্যর্থ: '+e.message)}};
  reset();redraw.push(draw);draw();
 }
 const postOpts=()=>S.posts.map(p=>[p.id,p.title]);
@@ -144,15 +145,26 @@ crud('t-reviews','reviews','রিভিউ',[
   fix:d=>{d.rating=Math.min(5,Math.max(1,d.rating||5))}});
 
 crud('t-prods','products','ডিজিটাল প্রোডাক্ট',[
- {k:'name',l:'নাম *',req:1,w:1},{k:'category',l:'ক্যাটাগরি',p:'Boost, Topup...'},{k:'badge',l:'ব্যাজ'},
+ {k:'name',l:'নাম *',req:1,w:1,p:'যেমনঃ Canva Pro / CapCut Pro / ChatGPT'},{k:'category',l:'ক্যাটাগরি',p:'Boost, Topup...'},{k:'badge',l:'ব্যাজ'},
  {k:'description',l:'বিবরণ',t:'area',w:1},{k:'image',l:'ছবির লিংক',w:1},
- {k:'originalPrice',l:'মূল মূল্য ৳',t:'number'},{k:'offerPrice',l:'অফার মূল্য ৳ *',t:'number',req:1},
+ {t:'sec',l:'⏳ সাবস্ক্রিপশন প্ল্যান — যে প্ল্যানের মূল্য ফাঁকা রাখবেন সেটা কাস্টমার দেখবে না। তিনটাই ফাঁকা রাখলে নিচের "অফার মূল্য" কাজ করবে।'},
+ {k:'m1Price',l:'1 Month — মূল্য ৳',t:'number'},{k:'m1Old',l:'1 Month — আগের মূল্য ৳ (ঐচ্ছিক)',t:'number'},
+ {k:'y1Price',l:'1 Year — মূল্য ৳',t:'number'},{k:'y1Old',l:'1 Year — আগের মূল্য ৳ (ঐচ্ছিক)',t:'number'},
+ {k:'ltPrice',l:'Lifetime — মূল্য ৳',t:'number'},{k:'ltOld',l:'Lifetime — আগের মূল্য ৳ (ঐচ্ছিক)',t:'number'},
+ {t:'sec',l:'💰 সিঙ্গেল প্রাইস (প্ল্যান ছাড়া প্রোডাক্টের জন্য)'},
+ {k:'originalPrice',l:'মূল মূল্য ৳',t:'number'},{k:'offerPrice',l:'অফার মূল্য ৳ (প্ল্যান না থাকলে *)',t:'number'},
  {k:'discountPercent',l:'ছাড় % (খালি = অটো)',t:'number'},{k:'productLink',l:'প্রোডাক্ট লিংক'},
- {k:'couponCode',l:'কুপন কোড',up:1},{k:'couponDiscount',l:'কুপন ছাড় ৳',t:'number'},
+ {k:'couponCode',l:'কুপন কোড (সব প্ল্যানে চলবে)',up:1},{k:'couponDiscount',l:'কুপন ছাড় ৳',t:'number'},
  {k:'pinned',l:'📌 পিন করুন',t:'check',d:false},{k:'featured',l:'ফিচার্ড',t:'check',d:false}],
- p=>`<b>${p.pinned?'📌 ':''}${esc(p.name)}</b><small>${esc(p.category||'')} · ৳${p.offerPrice||0}${p.couponCode?' · 🎟️ '+esc(p.couponCode):''}</small>`,
+ p=>{const pl=[['1M',p.m1Price],['1Y',p.y1Price],['LT',p.ltPrice]].filter(x=>+x[1]>0);
+  return `<b>${p.pinned?'📌 ':''}${esc(p.name)}</b><small>${esc(p.category||'')} · ${pl.length?pl.map(x=>x[0]+' ৳'+x[1]).join(' · '):'৳'+(p.offerPrice||0)}${p.couponCode?' · 🎟️ '+esc(p.couponCode):''}</small>`},
  {sort:(a,b)=>0,add:{createdAt:serverTimestamp()},
-  fix:d=>{if(!d.discountPercent&&d.originalPrice>d.offerPrice)d.discountPercent=Math.round((d.originalPrice-d.offerPrice)/d.originalPrice*100);if(!d.couponCode)d.couponDiscount=0}});
+  fix:d=>{
+   const pl=[[d.m1Price,d.m1Old],[d.y1Price,d.y1Old],[d.ltPrice,d.ltOld]].filter(x=>x[0]>0);
+   if(!pl.length&&!(d.offerPrice>0))throw new Error('অন্তত একটা প্ল্যানের মূল্য বা অফার মূল্য দিন');
+   if(pl.length){const m=pl.reduce((a,b)=>b[0]<a[0]?b:a);d.offerPrice=m[0];d.originalPrice=m[1]||0}
+   if(!d.discountPercent&&d.originalPrice>d.offerPrice)d.discountPercent=Math.round((d.originalPrice-d.offerPrice)/d.originalPrice*100);
+   if(!d.couponCode)d.couponDiscount=0}});
 
 /* ---------- Orders ---------- */
 const SL={pending:'পেন্ডিং',verified:'যাচাইকৃত',completed:'সম্পন্ন',rejected:'বাতিল'};
