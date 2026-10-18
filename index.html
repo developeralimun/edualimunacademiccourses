@@ -46,9 +46,9 @@ details.faq[open] summary::after{content:'−'}
 .pmc[data-m=bkash]{background:linear-gradient(135deg,#e2136e,#a50d52)}.pmc[data-m=nagad]{background:linear-gradient(135deg,#fb923c,#e8590c)}.pmc[data-m=rocket]{background:linear-gradient(135deg,#a78bfa,#5b21b6)}
 .lb{font-size:12px;font-weight:700;color:#334155;display:block;margin-bottom:6px}
 .offp{display:inline-block;margin:0 0 0 6px;padding:2px 10px;border-radius:999px;background:linear-gradient(135deg,#ef233c,#b91c1c);color:#fff;font-size:11px;font-weight:800;line-height:1.5;white-space:nowrap;vertical-align:middle;box-shadow:0 3px 8px -3px rgba(185,28,28,.5)}
-.plb{border:1.5px solid #E2E8F0;border-radius:14px;padding:10px 4px;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.15s;cursor:pointer}
-.plb b{font-size:13px;color:#0F172A}.plb s{font-size:11px;color:#94a3b8}.plb span{font-size:16px;font-weight:800;color:#0D9488}
-.plb.on{border-color:#0D9488;background:#F0FDFA;box-shadow:0 0 0 2px rgba(13,148,136,.25)}
+.opt{position:relative;border:1px solid #cbd5e1;padding:6px 14px;border-radius:4px;background:#fff;font-size:14px;color:#0F172A;cursor:pointer}
+.opt.on{border:2px solid #0F172A;padding:5px 13px}
+.opt.na{color:#94a3b8;border-color:#e2e8f0;cursor:not-allowed;background-image:linear-gradient(to top right,transparent calc(50% - 1px),#f87171,transparent calc(50% + 1px)),linear-gradient(to bottom right,transparent calc(50% - 1px),#f87171,transparent calc(50% + 1px))}
 </style></head>
 <body>
 <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
@@ -88,7 +88,7 @@ details.faq[open] summary::after{content:'−'}
     <p class="text-xs font-extrabold mb-3">✦ PREMIUM PACKAGES — প্যাকেজ নির্বাচন করুন</p>
     <div id="wrap"><div id="grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div><div class="fade"></div><button type="button" id="more">আরো দেখুন ⌄</button></div>
     <p id="empty" class="hidden text-center text-sm text-slate-400 py-8">এখনো কোনো প্যাকেজ নেই।</p></div>
-    <div id="prodPart" class="hidden"><div id="prodPlanBox" class="hidden mb-4"><p class="text-xs font-extrabold mb-2">⏳ সাবস্ক্রিপশন প্ল্যান নির্বাচন করুন</p><div id="prodPlans" class="grid gap-2"></div></div><div id="prodPrice" class="mb-4"></div><a id="prodWa" target="_blank" rel="noopener" class="btn block text-center py-3.5 rounded-2xl text-sm font-bold">💬 WhatsApp-এ অর্ডার করুন</a><p class="text-[11px] text-slate-400 text-center mt-2">বাটনে ক্লিক করলে হোয়াটসঅ্যাপে অর্ডারের মেসেজ তৈরি হয়ে যাবে।</p></div>
+    <div id="prodPart" class="hidden"><div id="prodPlanBox" class="hidden mb-4"></div><div id="prodPrice" class="mb-4"></div><a id="prodWa" target="_blank" rel="noopener" class="btn block text-center py-3.5 rounded-2xl text-sm font-bold">💬 WhatsApp-এ অর্ডার করুন</a><p class="text-[11px] text-slate-400 text-center mt-2">বাটনে ক্লিক করলে হোয়াটসঅ্যাপে অর্ডারের মেসেজ তৈরি হয়ে যাবে।</p></div>
     <p id="postContent" class="hidden text-sm text-slate-500 leading-relaxed whitespace-pre-line mt-6"></p>
    </div>
   </div>
@@ -220,9 +220,12 @@ const $=id=>document.getElementById(id);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('yr').textContent=new Date().getFullYear();
 const offPill=(price,old,pct)=>{price=+price;old=+old;const n=old>price&&price>=0?Math.round((old-price)/old*100):(+pct||0);return n>0?`<span class="offp">${n}% ছাড়</span>`:''};
-const PLAN_DEF=[['m1','1 Month'],['y1','1 Year'],['lt','Lifetime']];
-const plansOf=p=>PLAN_DEF.map(([k,l])=>({label:l,price:+p[k+'Price']||0,old:+p[k+'Old']||0})).filter(x=>x.price>0);
-let PSEL=0,CFG={},POSTS=[],PRODUCTS=[],PKGS=[],POST=null,cur=null,disc=0,code='',busy=false,unsubPkg=null,term='',dpFilter='all';
+const numOf=x=>+String(x||'').replace(/[^\d.]/g,'')||0;
+const plansOf=p=>{const out=String(p.variants||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a.length>=3&&numOf(a[2])>0)
+  .map(a=>({acc:a[0]==='-'?'':a[0],dur:a[1]==='-'?'':a[1],price:numOf(a[2]),old:numOf(a[3])}));
+ if(out.length)return out;
+ return [['1 Month','m1'],['1 Year','y1'],['Lifetime','lt']].map(([d,k])=>({acc:'',dur:d,price:+p[k+'Price']||0,old:+p[k+'Old']||0})).filter(v=>v.price>0)};
+let SEL=null,CFG={},POSTS=[],PRODUCTS=[],PKGS=[],POST=null,cur=null,disc=0,code='',busy=false,unsubPkg=null,term='',dpFilter='all';
 
 /* ---------- Settings ---------- */
 onSnapshot(doc(db,'settings','storeConfig'),s=>{CFG=s.exists()?s.data():{};
@@ -268,7 +271,7 @@ function route(){
  $('hImg').classList.toggle('hidden',!p.image);if(p.image)$('hImgTag').src=p.image;
  $('postContent').textContent=p.content||'';$('postContent').classList.toggle('hidden',!p.content);
  if(shownId!==id){
-  shownId=id;expanded=false;revAll=false;PSEL=0;scrollTo(0,0);if(unsubPkg)unsubPkg();if(unsubRev)unsubRev();
+  shownId=id;expanded=false;revAll=false;SEL=null;scrollTo(0,0);if(unsubPkg)unsubPkg();if(unsubRev)unsubRev();
   const src=p.source||'packages';
   unsubPkg=onSnapshot(collection(db,src),sn=>{
    PKGS=sn.docs.map(d=>{const x=d.data();return{id:d.id,label:x.label||(x.coins?x.coins+' Coins':x.stars?x.stars+' Stars':''),price:+x.price||0,oldPrice:+x.oldPrice||0,order:x.coins||x.stars||x.order||0,couponCode:x.couponCode||'',couponDiscount:+x.couponDiscount||0,postId:x.postId}}).filter(x=>x.label&&(src!=='packages'||x.postId===id)).sort((a,b)=>a.order-b.order);
@@ -279,16 +282,27 @@ function route(){
  renderOthers();
 }
 function setProdWa(){if(!POST||POST.postType!=='product')return;const n=String(CFG.whatsappNumber||'8801948901917').replace(/\D/g,'');
- const pl=plansOf(POST),x=pl.length?pl[PSEL]:null,pr=x?x.price:+POST.price;
- $('prodWa').href=`https://wa.me/${n}?text=${encodeURIComponent(`Hello alimixstore, আমি "${POST.title}"${x?` — ${x.label}`:''} অর্ডার করতে চাই।`+(pr>0?`\nমূল্য: ৳${pr}`:''))}`}
-function drawProd(){const p=POST;if(!p||p.postType!=='product')return;const pl=plansOf(p);if(PSEL>=pl.length)PSEL=0;
- $('prodPlanBox').classList.toggle('hidden',!pl.length);
- $('prodPlans').style.gridTemplateColumns=`repeat(${pl.length||1},minmax(0,1fr))`;
- $('prodPlans').innerHTML=pl.map((x,k)=>`<button type="button" data-k="${k}" class="plb ${k===PSEL?'on':''}"><b>${esc(x.label)}</b>${x.old>x.price?`<s>৳${x.old}</s>`:''}<span>৳${x.price}</span></button>`).join('');
- const x=pl.length?pl[PSEL]:{price:+p.price||0,old:+p.oldPrice||0};
- $('prodPrice').innerHTML=x.price>0?`<span class="text-3xl font-extrabold">৳${x.price}</span>${x.old>x.price?` <s class="text-slate-400">৳${x.old}</s>`:''}${offPill(x.price,x.old)}`:'';
- setProdWa()}
-$('prodPlans').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b){PSEL=+b.dataset.k;drawProd()}});
+ const {V,m}=varCtx(),pr=m?m.price:(V.length?0:+POST.price),lab=m?[m.acc,m.dur].filter(Boolean).join(', '):'';
+ $('prodWa').href=`https://wa.me/${n}?text=${encodeURIComponent(`Hello alimixstore, আমি "${POST.title}"${lab?` (${lab})`:''} অর্ডার করতে চাই।`+(pr>0?`\nমূল্য: ৳${pr}`:''))}`}
+function varCtx(){const V=plansOf(POST),accs=[...new Set(V.map(v=>v.acc).filter(Boolean))],durs=[...new Set(V.map(v=>v.dur).filter(Boolean))];
+ if(!SEL){const f=V[0];SEL=f?{acc:f.acc,dur:f.dur}:{acc:'',dur:''}}
+ const ok=(!accs.length||SEL.acc)&&(!durs.length||SEL.dur);
+ const m=V.length&&ok?(V.find(v=>v.acc===SEL.acc&&v.dur===SEL.dur)||null):null;
+ return{V,accs,durs,m}}
+function drawProd(){const p=POST;if(!p||p.postType!=='product')return;const {V,accs,durs,m}=varCtx();
+ const grp=(title,key,list)=>{if(!list.length)return '';const o=key==='acc'?'dur':'acc';
+  return `<p class="text-sm font-bold text-slate-700 mb-2">${title} : ${esc(SEL[key]||'')}</p><div class="flex flex-wrap gap-2 mb-3">${list.map(x=>{const av=V.some(v=>v[key]===x&&(!SEL[o]||v[o]===SEL[o]));return `<button type="button" data-g="${key}" data-v="${esc(x)}" class="opt ${SEL[key]===x?'on':''} ${av?'':'na'}" ${av?'':'disabled'}>${esc(x)}</button>`}).join('')}</div>`};
+ $('prodPlanBox').classList.toggle('hidden',!V.length);
+ $('prodPlanBox').innerHTML=grp('Account Type','acc',accs)+grp('Duration','dur',durs)+((SEL.acc||SEL.dur)?'<button type="button" id="selClr" class="text-[11px] text-slate-400 uppercase tracking-wide">Clear</button>':'');
+ let pr='';
+ if(V.length){
+  if(m)pr=`<span class="text-3xl font-extrabold">৳${m.price}</span>${m.old>m.price?` <s class="text-slate-400">৳${m.old}</s>`:''}${offPill(m.price,m.old)}`;
+  else{const ps=V.map(v=>v.price),lo=Math.min(...ps),hi=Math.max(...ps);pr=`<span class="text-2xl font-extrabold">৳${lo}${hi>lo?' – ৳'+hi:''}</span> <span class="text-xs text-slate-400">অপশন নির্বাচন করুন</span>`}
+ }else pr=+p.price>0?`<span class="text-3xl font-extrabold">৳${+p.price}</span>${+p.oldPrice>+p.price?` <s class="text-slate-400">৳${+p.oldPrice}</s>`:''}${offPill(p.price,p.oldPrice)}`:'';
+ $('prodPrice').innerHTML=pr;setProdWa()}
+$('prodPlanBox').addEventListener('click',e=>{if(e.target.id==='selClr'){SEL={acc:'',dur:''};drawProd();return}
+ const b=e.target.closest('[data-g]');if(!b||b.disabled)return;if(!SEL)SEL={acc:'',dur:''};SEL[b.dataset.g]=SEL[b.dataset.g]===b.dataset.v?'':b.dataset.v;drawProd()});
+$('prodWa').addEventListener('click',e=>{if(POST&&POST.postType==='product'){const {V,m}=varCtx();if(V.length&&!m){e.preventDefault();alert('আগে অপশন (Account Type / Duration) নির্বাচন করুন।')}}});
 function drawPkgs(){
  $('empty').classList.toggle('hidden',PKGS.length>0);
  const ic=POST.icon||(POST.accountType==='facebook'?'star':'coin');
