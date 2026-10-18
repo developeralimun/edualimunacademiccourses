@@ -174,7 +174,7 @@ $('csv').onclick=()=>{if(!RL.length)return toast('কোনো কুপন অ�
 
 /* ---------- Settings ---------- */
 const SF=[['bkashNumber','bKash নাম্বার'],['nagadNumber','Nagad নাম্বার'],['rocketNumber','Rocket নাম্বার'],['whatsappNumber','WhatsApp নাম্বার (8801XXXXXXXXX)'],
- ['bkashRule','bKash নিয়মাবলী','a'],['nagadRule','Nagad নিয়মাবলী','a'],['rocketRule','Rocket নিয়মাবলী','a'],['telegramBotToken','Telegram Bot Token'],['telegramChatId','Telegram Chat ID']];
+ ['bkashRule','bKash নিয়মাবলী','a'],['nagadRule','Nagad নিয়মাবলী','a'],['rocketRule','Rocket নিয়মাবলী','a'],['facebookUrl','Facebook পেজ লিংক'],['youtubeUrl','YouTube চ্যানেল লিংক'],['telegramUrl','Telegram গ্রুপ/চ্যানেল লিংক'],['telegramBotToken','Telegram Bot Token'],['telegramChatId','Telegram Chat ID']];
 $('setF').innerHTML=SF.map(([k,l,a])=>`<div class="${a?'w':''}"><label>${l}</label>${a?`<textarea id="c_${k}"></textarea>`:`<input id="c_${k}">`}</div>`).join('');
 $('setS').onclick=async()=>{const d={};SF.forEach(([k])=>d[k]=$('c_'+k).value.trim());await setDoc(doc(db,'settings','storeConfig'),d,{merge:true});toast('সেটিংস সংরক্ষণ হয়েছে ✓')};
 
