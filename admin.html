@@ -21,6 +21,7 @@ input[type=checkbox]{width:auto}textarea{min-height:70px}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}
 .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}.stat div{background:#0a2036;border:1px solid var(--line);border-radius:12px;padding:12px}.stat b{display:block;font-size:20px;color:var(--g)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#132e43;border:1px solid var(--g);padding:10px 20px;border-radius:99px;font-size:14px;z-index:9}
+.sec{grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px;margin-top:4px;color:var(--g);font-weight:700;font-size:13px}
 @media(max-width:600px){.fg{grid-template-columns:1fr}.it{flex-direction:column;align-items:flex-start}}
 </style></head><body><div class="wrap">
 
@@ -32,7 +33,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
 
 <div id="app" class="hid">
  <div class="top"><div><div class="brand">alimix<span>store</span> Admin</div><div class="mut" id="who"></div></div>
-  <div class="r"><a class="n" href="index.html" target="_blank" style="text-decoration:none">সাইট দেখুন</a><button class="d" id="out">লগআউট</button></div></div>
+  <div class="r"><a class="n" href="/" target="_blank" style="text-decoration:none">সাইট দেখুন</a><button class="d" id="out">লগআউট</button></div></div>
  <div class="tabs" id="tabs">
   <button class="tab on" data-t="orders">🧾 অর্ডার</button><button class="tab" data-t="posts">📝 পোস্ট</button><button class="tab" data-t="pkgs">📦 প্যাকেজ</button>
   <button class="tab" data-t="reviews">⭐ রিভিউ</button><button class="tab" data-t="prods">🛍️ ডিজিটাল প্রোডাক্ট</button><button class="tab" data-t="report">📊 কুপন রিপোর্ট</button><button class="tab" data-t="set">⚙️ সেটিংস</button></div>
@@ -49,7 +50,9 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
   <div class="g r" style="align-items:end"><div><label>সময়</label><select id="rp"><option value="week">এই সপ্তাহ</option><option value="month" selected>এই মাস</option><option value="all">সব সময়</option></select></div><button class="b" id="csv">⬇️ Excel/CSV ডাউনলোড</button></div>
   <div class="stat"><div>কুপন অর্ডার<b id="rC">0</b></div><div>মোট ছাড় (ক্ষতি)<b id="rD" style="color:var(--red)">৳0</b></div><div>মোট আদায়<b id="rF">৳0</b></div></div>
   <div class="g" style="overflow-x:auto"><table><thead><tr><th>তারিখ</th><th>কুপন</th><th>গ্রাহক</th><th>প্যাকেজ</th><th>আসল</th><th>ছাড়</th><th>প্রদত্ত</th></tr></thead><tbody id="rB"></tbody></table></div></section>
- <section id="t-set" class="tp hid"><div class="g"><div class="fg" id="setF"></div><button class="b" id="setS">সংরক্ষণ করুন</button></div></section>
+ <section id="t-set" class="tp hid"><div class="g"><div class="fg" id="setF"></div>
+  <div class="r"><button class="b" id="setS">সংরক্ষণ করুন</button><button class="n" id="smap" type="button">🗺️ sitemap.xml ডাউনলোড</button></div>
+  <p class="mut" style="margin-top:10px">নতুন পোস্ট/প্রোডাক্ট যোগ করলে sitemap.xml নামিয়ে সাইটের ফোল্ডারে বসিয়ে আবার deploy করুন, তারপর Google Search Console-এ জমা দিন।</p></div></section>
 </div></div>
 <div id="toast" class="toast hid"></div>
 
@@ -59,8 +62,10 @@ import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "htt
 import {getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,setDoc,onSnapshot,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAa8YiG1P7rZoCg-enQ0E2HflfDY7JFPyQ",authDomain:"alimixstoretopup.firebaseapp.com",projectId:"alimixstoretopup",storageBucket:"alimixstoretopup.firebasestorage.app",messagingSenderId:"102854684850",appId:"1:102854684850:web:c11f6ee301a29ffdc7d9ab"});
 const auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+const DOMAIN='https://alimixstore.shop';
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hid');setTimeout(()=>t.classList.add('hid'),2000)};
+const slugify=v=>String(v||'').toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
 const S={posts:[],packages:[],products:[],orders:[],reviews:[]};const redraw=[];
 
 /* ---------- Auth ---------- */
@@ -116,6 +121,9 @@ crud('t-posts','posts','পোস্ট (হোম কার্ড)',[
  {k:'variants',l:'⏳ অপশন ও মূল্য — প্রতি লাইনে একটা: Account Type | Duration | মূল্য | আগের মূল্য (ঐচ্ছিক)। কোনো একটা না লাগলে ওই ঘরে - দিন। খালি রাখলে উপরের সিঙ্গেল মূল্য কাজ করবে।',t:'area',w:1,p:'Shared | 1 Month | 299 | 399\nShared | 3 Months | 799\nPersonal | 1 Month | 2750\nPersonal | 1 Year | 9990 | 12999',when:['postType','product']},
  {k:'order',l:'ক্রম',t:'number',p:'1,2,3...'},{k:'badge',l:'ব্যাজ (Hot/New)'},
  {k:'image',l:'ছবির লিংক (ঐচ্ছিক)',w:1},
+ {k:'slug',l:'🔎 URL slug (ইংরেজিতে, যেমন tiktok-coin-bd) — খালি = অটো ID। একবার দিলে বদলাবেন না।',w:1,p:'tiktok-coin-bd'},
+ {k:'seoTitle',l:'🔎 SEO টাইটেল (গুগলে যা দেখাবে, ৫০-৬০ অক্ষর) — খালি = অটো',w:1,p:'TikTok Coin Buy BD – bKash, Nagad দিয়ে রিচার্জ | alimixstore'},
+ {k:'seoDesc',l:'🔎 SEO বিবরণ (১৪০-১৬০ অক্ষর) — খালি = অটো',t:'area',w:1,p:'বাংলাদেশে bKash, Nagad, Rocket দিয়ে TikTok Coin কিনুন...'},
  {k:'accountType',l:'অ্যাকাউন্ট টাইপ',t:'sel',when:['postType','package'],o:[['tiktok','TikTok (Username চাইবে)'],['facebook','Facebook (ID / Page লিংক চাইবে)'],['other','Other']]},
  {k:'icon',l:'প্যাকেজ আইকন',t:'sel',when:['postType','package'],o:[['coin','🪙 কয়েন'],['star','⭐ স্টার'],['none','কিছু না']]},
  {k:'accountLabel',l:'ধাপ ১ লেবেল (খালি = অটো)',when:['postType','package'],p:'TikTok Username@ *'},
@@ -123,8 +131,8 @@ crud('t-posts','posts','পোস্ট (হোম কার্ড)',[
  {k:'accountPlaceholder',l:'ইনপুট প্লেসহোল্ডার (খালি = অটো)',when:['postType','package'],p:'@username'},
  {k:'source',l:'প্যাকেজের উৎস',t:'sel',when:['postType','package'],o:[['packages','নতুন সিস্টেম'],['coinPackages','আগের TikTok Coin ডেটা'],['starPackages','আগের Facebook Star ডেটা']]},
  {k:'active',l:'হোমে দেখাবে',t:'check'}],
- p=>`<b>${p.postType==='product'?'🛍️':'📦'} ${p.active===false?'🚫 ':''}${esc(p.title)}</b><small>${p.postType==='product'?'সাধারণ পোস্ট'+(p.variants&&p.variants.trim()?' · '+p.variants.trim().split('\n').length+'টি অপশন':(p.price?' · ৳'+p.price:'')):esc(p.accountType||'')+' · '+esc(p.source||'packages')} · ক্রম ${p.order||'-'}</small>`,
- {fix:d=>{if(!d.order)d.order=Date.now()}});
+ p=>`<b>${p.postType==='product'?'🛍️':'📦'} ${p.active===false?'🚫 ':''}${esc(p.title)}</b><small>${p.postType==='product'?'সাধারণ পোস্ট'+(p.variants&&p.variants.trim()?' · '+p.variants.trim().split('\n').length+'টি অপশন':(p.price?' · ৳'+p.price:'')):esc(p.accountType||'')+' · '+esc(p.source||'packages')} · ক্রম ${p.order||'-'}</small><small>🔗 /p/${esc(p.slug||p.id)}</small>`,
+ {fix:d=>{if(!d.order)d.order=Date.now();d.slug=slugify(d.slug)}});
 
 crud('t-pkgs','packages','প্যাকেজ',[
  {k:'postId',l:'কোন পোস্টের প্যাকেজ *',t:'sel',o:pkgPostOpts,req:1,w:1},
@@ -150,11 +158,14 @@ crud('t-prods','products','ডিজিটাল প্রোডাক্ট',[
  {k:'variants',l:'⏳ অপশন ও মূল্য — প্রতি লাইনে একটা: Account Type | Duration | মূল্য | আগের মূল্য (ঐচ্ছিক)। কোনো একটা না লাগলে ওই ঘরে - দিন। খালি রাখলে নিচের সিঙ্গেল মূল্য কাজ করবে।',t:'area',w:1,p:'Shared | 1 Month | 299 | 399\nShared | 3 Months | 799\nPersonal | 1 Month | 2750\nPersonal | 1 Year | 9990 | 12999'},
  {k:'originalPrice',l:'মূল মূল্য ৳ (অপশন না থাকলে)',t:'number'},{k:'offerPrice',l:'অফার মূল্য ৳ (অপশন না থাকলে *)',t:'number'},
  {k:'discountPercent',l:'ছাড় % (খালি = অটো)',t:'number'},{k:'productLink',l:'প্রোডাক্ট লিংক'},
+ {k:'slug',l:'🔎 URL slug (ইংরেজিতে, যেমন netflix-premium-bd) — খালি = অটো ID। একবার দিলে বদলাবেন না।',w:1,p:'netflix-premium-bd'},
+ {k:'seoTitle',l:'🔎 SEO টাইটেল (গুগলে যা দেখাবে, ৫০-৬০ অক্ষর) — খালি = অটো',w:1,p:'Netflix Premium Subscription BD – দাম ও অর্ডার | alimixstore'},
+ {k:'seoDesc',l:'🔎 SEO বিবরণ (১৪০-১৬০ অক্ষর) — খালি = অটো',t:'area',w:1},
  {k:'couponCode',l:'কুপন কোড',up:1},{k:'couponDiscount',l:'কুপন ছাড় ৳',t:'number'},
  {k:'pinned',l:'📌 পিন করুন',t:'check',d:false},{k:'featured',l:'ফিচার্ড',t:'check',d:false}],
- p=>`<b>${p.pinned?'📌 ':''}${esc(p.name)}</b><small>${esc(p.category||'')} · ৳${p.offerPrice||0}${p.couponCode?' · 🎟️ '+esc(p.couponCode):''}</small>`,
+ p=>`<b>${p.pinned?'📌 ':''}${esc(p.name)}</b><small>${esc(p.category||'')} · ৳${p.offerPrice||0}${p.couponCode?' · 🎟️ '+esc(p.couponCode):''}</small><small>🔗 /d/${esc(p.slug||p.id)}</small>`,
  {sort:(a,b)=>0,add:{createdAt:serverTimestamp()},
-  fix:d=>{const vs=String(d.variants||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a.length>=3&&+String(a[2]).replace(/[^\d.]/g,'')>0).map(a=>[+String(a[2]).replace(/[^\d.]/g,''),+String(a[3]||'').replace(/[^\d.]/g,'')||0]);
+  fix:d=>{d.slug=slugify(d.slug);const vs=String(d.variants||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a.length>=3&&+String(a[2]).replace(/[^\d.]/g,'')>0).map(a=>[+String(a[2]).replace(/[^\d.]/g,''),+String(a[3]||'').replace(/[^\d.]/g,'')||0]);
    if(vs.length){const m=vs.reduce((x,y)=>y[0]<x[0]?y:x);d.offerPrice=m[0];d.originalPrice=m[1];d.discountPercent=0}else if(!(d.offerPrice>0))throw new Error('অপশন অথবা অফার মূল্য দিন');
    if(!d.discountPercent&&d.originalPrice>d.offerPrice)d.discountPercent=Math.round((d.originalPrice-d.offerPrice)/d.originalPrice*100);if(!d.couponCode)d.couponDiscount=0}});
 
@@ -194,10 +205,18 @@ $('csv').onclick=()=>{if(!RL.length)return toast('কোনো কুপন অ�
  a.download='coupon-report-'+new Date().toISOString().slice(0,10)+'.csv';a.click()};
 
 /* ---------- Settings ---------- */
-const SF=[['bkashNumber','bKash নাম্বার'],['nagadNumber','Nagad নাম্বার'],['rocketNumber','Rocket নাম্বার'],['whatsappNumber','WhatsApp নাম্বার (8801XXXXXXXXX)'],
+const SF=[['notice1','🔔 নোটিশ ১ (ডার্ক নেভি) — "লেবেল: মেসেজ" লিখুন। যেমন: নোটিশ: নতুন অফার চলছে','a'],['notice2','🔥 নোটিশ ২ (লাল) — যেমন: বিশেষ অফার: ১০০০+ Coin কিনলে ছাড়','a'],['notice3','💳 নোটিশ ৩ (হলুদ) — যেমন: পেমেন্ট: bKash, Nagad, Rocket দিয়ে অর্ডার করুন','a'],
+ ['seoTitle','🔎 হোমপেজ SEO টাইটেল (খালি = ডিফল্ট)'],['ogImage','🔎 শেয়ার ইমেজ লিংক (খালি = logo.jpg)'],['seoDesc','🔎 হোমপেজ SEO বিবরণ (১৪০-১৬০ অক্ষর, খালি = ডিফল্ট)','a'],
+ ['bkashNumber','bKash নাম্বার'],['nagadNumber','Nagad নাম্বার'],['rocketNumber','Rocket নাম্বার'],['whatsappNumber','WhatsApp নাম্বার (8801XXXXXXXXX)'],
  ['bkashRule','bKash নিয়মাবলী','a'],['nagadRule','Nagad নিয়মাবলী','a'],['rocketRule','Rocket নিয়মাবলী','a'],['facebookUrl','Facebook পেজ লিংক'],['youtubeUrl','YouTube চ্যানেল লিংক'],['telegramUrl','Telegram গ্রুপ/চ্যানেল লিংক'],['faqText','FAQ — প্রশ্ন একটা লাইনে, উত্তর পরের লাইনে। দুই প্রশ্নের মাঝে একটা ফাঁকা লাইন। খালি রাখলে ডিফল্ট FAQ দেখাবে','a'],['telegramBotToken','Telegram Bot Token'],['telegramChatId','Telegram Chat ID']];
 $('setF').innerHTML=SF.map(([k,l,a])=>`<div class="${a?'w':''}"><label>${l}</label>${a?`<textarea id="c_${k}"></textarea>`:`<input id="c_${k}">`}</div>`).join('');
 $('setS').onclick=async()=>{const d={};SF.forEach(([k])=>d[k]=$('c_'+k).value.trim());await setDoc(doc(db,'settings','storeConfig'),d,{merge:true});toast('সেটিংস সংরক্ষণ হয়েছে ✓')};
+
+/* ---------- sitemap.xml ---------- */
+$('smap').onclick=()=>{const t=new Date().toISOString().slice(0,10);
+ const u=[DOMAIN+'/',...S.posts.filter(p=>p.active!==false).map(p=>DOMAIN+'/p/'+encodeURIComponent(p.slug||p.id)),...S.products.map(p=>DOMAIN+'/d/'+encodeURIComponent(p.slug||p.id)),DOMAIN+'/privacy.html',DOMAIN+'/refund.html'];
+ const x='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+u.map(l=>`<url><loc>${l}</loc><lastmod>${t}</lastmod></url>`).join('\n')+'\n</urlset>';
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([x],{type:'application/xml'}));a.download='sitemap.xml';a.click();toast('sitemap.xml নামানো হয়েছে ✓')};
 
 function start(){
  ['posts','packages','products','orders','reviews'].forEach(c=>onSnapshot(collection(db,c),s=>{S[c]=s.docs.map(d=>({id:d.id,...d.data()}));
