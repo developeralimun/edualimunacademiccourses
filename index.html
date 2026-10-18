@@ -49,6 +49,10 @@ details.faq[open] summary::after{content:'−'}
 .opt{position:relative;border:1px solid #cbd5e1;padding:6px 14px;border-radius:4px;background:#fff;font-size:14px;color:#0F172A;cursor:pointer}
 .opt.on{border:2px solid #0F172A;padding:5px 13px}
 .opt.na{color:#94a3b8;border-color:#e2e8f0;cursor:not-allowed;background-image:linear-gradient(to top right,transparent calc(50% - 1px),#f87171,transparent calc(50% + 1px)),linear-gradient(to bottom right,transparent calc(50% - 1px),#f87171,transparent calc(50% + 1px))}
+.rich{font-size:.875rem;color:#475569;line-height:1.75;word-break:break-word}
+.rich p{margin:0 0 .85rem}
+.rich h3{font-weight:800;color:#0f172a;font-size:1.05rem;margin:1.2rem 0 .65rem;padding-left:.65rem;border-left:3px solid #0D9488}
+.rich ul{list-style:disc;padding-left:1.4rem;margin:0 0 .85rem}.rich li{margin:.2rem 0}
 </style></head>
 <body>
 <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
@@ -89,7 +93,7 @@ details.faq[open] summary::after{content:'−'}
     <div id="wrap"><div id="grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div><div class="fade"></div><button type="button" id="more">আরো দেখুন ⌄</button></div>
     <p id="empty" class="hidden text-center text-sm text-slate-400 py-8">এখনো কোনো প্যাকেজ নেই।</p></div>
     <div id="prodPart" class="hidden"><div id="prodPlanBox" class="hidden mb-4"></div><div id="prodPrice" class="mb-4"></div><a id="prodWa" target="_blank" rel="noopener" class="btn block text-center py-3.5 rounded-2xl text-sm font-bold">💬 WhatsApp-এ অর্ডার করুন</a><p class="text-[11px] text-slate-400 text-center mt-2">বাটনে ক্লিক করলে হোয়াটসঅ্যাপে অর্ডারের মেসেজ তৈরি হয়ে যাবে।</p></div>
-    <p id="postContent" class="hidden text-sm text-slate-500 leading-relaxed whitespace-pre-line mt-6"></p>
+    <div id="postContent" class="hidden rich mt-6 pt-5 border-t border-slate-200"></div>
    </div>
   </div>
   <div class="card rounded-3xl p-5 sm:p-6">
@@ -220,6 +224,15 @@ const $=id=>document.getElementById(id);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('yr').textContent=new Date().getFullYear();
 const offPill=(price,old,pct)=>{price=+price;old=+old;const n=old>price&&price>=0?Math.round((old-price)/old*100):(+pct||0);return n>0?`<span class="offp">${n}% ছাড়</span>`:''};
+const fmt=t=>{const L=String(t||'').replace(/\r/g,'').split('\n');let h='',ul=false,para=[];
+ const link=x=>esc(x).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener" class="text-primary underline break-all">${u}</a>`);
+ const fp=()=>{if(para.length){h+=`<p>${para.join('<br>')}</p>`;para=[]}},cu=()=>{if(ul){h+='</ul>';ul=false}};
+ for(const raw of L){const ln=raw.trim();
+  if(!ln){fp();cu();continue}
+  if(/^#{1,3}\s+/.test(ln)){fp();cu();h+=`<h3>${link(ln.replace(/^#+\s+/,''))}</h3>`;continue}
+  if(/^([-•✓✔*]|\d+[.)])\s+/.test(ln)){fp();if(!ul){h+='<ul>';ul=true}h+=`<li>${link(ln.replace(/^([-•✓✔*]|\d+[.)])\s+/,''))}</li>`;continue}
+  cu();para.push(link(ln))}
+ fp();cu();return h};
 const numOf=x=>+String(x||'').replace(/[^\d.]/g,'')||0;
 const plansOf=p=>{const out=String(p.variants||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a.length>=3&&numOf(a[2])>0)
   .map(a=>({acc:a[0]==='-'?'':a[0],dur:a[1]==='-'?'':a[1],price:numOf(a[2]),old:numOf(a[3])}));
@@ -255,7 +268,7 @@ const prodCard=p=>{const bd=p.badge||(p.discountPercent?`-${p.discountPercent}%`
  <div class="pbody"><div class="pcat">${esc(p.category||'Digital')}</div><div class="ptitle">${esc(p.name)}</div><div class="pdesc">${esc(p.description||'')}</div>
  <div class="pfoot"><div class="pprice">৳${esc(p.offerPrice||0)}${p.originalPrice>p.offerPrice?`<span class="old">৳${esc(p.originalPrice)}</span>`:''}${offPill(p.offerPrice,p.originalPrice,p.discountPercent)}</div><span class="pbuy">Buy Now →</span></div></div></a>`};
 
-const dpost=id=>{const x=PRODUCTS.find(y=>y.id===id);return x?{id:x.id,title:x.name||'',desc:x.description||'',content:'',image:x.image||'',postType:'product',variants:x.variants||'',price:+x.offerPrice||0,oldPrice:+x.originalPrice||0}:null};
+const dpost=id=>{const x=PRODUCTS.find(y=>y.id===id);return x?{id:x.id,title:x.name||'',desc:x.description||'',content:x.content||'',image:x.image||'',postType:'product',variants:x.variants||'',price:+x.offerPrice||0,oldPrice:+x.originalPrice||0}:null};
 function route(){
  const m=location.hash.match(/^#([pd])=(.+)$/),id=m?decodeURIComponent(m[2]):null,isD=!!m&&m[1]==='d';
  if(!id){
@@ -270,7 +283,7 @@ function route(){
  
  $('title').textContent=p.title;$('desc').textContent=p.desc||'';
  $('hImg').classList.toggle('hidden',!p.image);if(p.image)$('hImgTag').src=p.image;
- $('postContent').textContent=p.content||'';$('postContent').classList.toggle('hidden',!p.content);
+ $('postContent').innerHTML=fmt(p.content);$('postContent').classList.toggle('hidden',!p.content);
  if(shownId!==id){
   shownId=id;expanded=false;revAll=false;SEL=null;scrollTo(0,0);if(unsubPkg)unsubPkg();if(unsubRev)unsubRev();
   const src=p.source||'packages';
