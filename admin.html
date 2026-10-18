@@ -21,14 +21,15 @@
   <input id="pTitle" class="in mb-2" placeholder="টাইটেল (যেমনঃ TikTok Coin)"/>
   <textarea id="pDesc" rows="2" class="in mb-2" placeholder="ছোট বিবরণ"></textarea>
   <div class="grid grid-cols-2 gap-2 mb-2">
-   <select id="pSection" class="in"><option value="topup">সেকশন: Coin &amp; Star</option><option value="boost">সেকশন: Boosting</option></select>
+   <select id="pSection" class="in"><option value="purchase">সেকশন: Digital Purchase</option></select>
    <input id="pOrder" type="number" class="in" placeholder="ক্রম (১,২,৩...)"/>
    <input id="pBadge" class="in" placeholder="ব্যাজ (Hot/New) ঐচ্ছিক"/>
    <select id="pAcc" class="in"><option value="tiktok">অ্যাকাউন্ট: TikTok</option><option value="facebook">অ্যাকাউন্ট: Facebook</option></select>
   </div>
   <input id="pAccLabel" class="in mb-2" placeholder="গ্রাহকের ইনপুট লেবেল (যেমনঃ TikTok Username@ / Facebook পোস্ট লিংক)"/>
-  <input id="pImage" class="in mb-2" placeholder="কার্ডের ছবির লিংক (ঐচ্ছিক — প্যাকেজ পেজে ছবি দেখাবে না)"/>
+  <input id="pImage" class="in mb-2" placeholder="ছবির লিংক (হোম কার্ড ও প্যাকেজ পেজের উপরে দেখাবে) — ঐচ্ছিক"/>
   <select id="pSource" class="in mb-2"><option value="packages">প্যাকেজ: নতুন সিস্টেম (এখান থেকে যোগ করুন)</option><option value="coinPackages">প্যাকেজ: আগের TikTok Coin ডেটা</option><option value="starPackages">প্যাকেজ: আগের Facebook Star ডেটা</option></select>
+  <select id="pIcon" class="in mb-2"><option value="coin">প্যাকেজ আইকন: কয়েন 🪙</option><option value="star">প্যাকেজ আইকন: স্টার ⭐</option><option value="none">প্যাকেজ আইকন: কিছু না</option></select>
   <label class="text-xs flex items-center gap-2 mb-3"><input type="checkbox" id="pActive" checked/> হোমে দেখাবে</label>
   <div class="flex gap-2"><button id="pSave" class="b">সংরক্ষণ</button><button id="pReset" class="n">নতুন</button></div>
   <div id="postList" class="mt-4 space-y-2"></div>
@@ -72,11 +73,11 @@ $('postList').addEventListener('click',async e=>{
  const id=e.target.dataset.e||e.target.dataset.d;if(!id)return;const p=POSTS.find(x=>x.id===id);
  if(e.target.dataset.d){if(confirm('পোস্টটি মুছে ফেলবেন? (প্যাকেজগুলো আলাদা থেকে যাবে)'))await deleteDoc(doc(db,'posts',id));return}
  $('pId').value=id;$('pTitle').value=p.title||'';$('pDesc').value=p.desc||'';$('pSection').value=p.section||'topup';$('pOrder').value=p.order||'';$('pBadge').value=p.badge||'';
- $('pAcc').value=p.accountType||'tiktok';$('pAccLabel').value=p.accountLabel||'';$('pImage').value=p.image||'';$('pSource').value=p.source||'packages';$('pActive').checked=p.active!==false;scrollTo(0,0)});
+ $('pAcc').value=p.accountType||'tiktok';$('pAccLabel').value=p.accountLabel||'';$('pImage').value=p.image||'';$('pSource').value=p.source||'packages';$('pIcon').value=p.icon||'coin';$('pActive').checked=p.active!==false;scrollTo(0,0)});
 $('pReset').onclick=()=>{['pId','pTitle','pDesc','pOrder','pBadge','pAccLabel','pImage'].forEach(i=>$(i).value='');$('pActive').checked=true};
 $('pSave').onclick=async()=>{
  const t=$('pTitle').value.trim();if(!t)return alert('টাইটেল দিন');
- const d={title:t,desc:$('pDesc').value.trim(),section:$('pSection').value,order:+$('pOrder').value||Date.now(),badge:$('pBadge').value.trim(),accountType:$('pAcc').value,accountLabel:$('pAccLabel').value.trim()||'অ্যাকাউন্ট / লিংক *',image:$('pImage').value.trim(),source:$('pSource').value,active:$('pActive').checked};
+ const d={title:t,desc:$('pDesc').value.trim(),section:$('pSection').value,order:+$('pOrder').value||Date.now(),badge:$('pBadge').value.trim(),accountType:$('pAcc').value,accountLabel:$('pAccLabel').value.trim()||'অ্যাকাউন্ট / লিংক *',image:$('pImage').value.trim(),source:$('pSource').value,icon:$('pIcon').value,active:$('pActive').checked};
  const id=$('pId').value;id?await updateDoc(doc(db,'posts',id),d):await addDoc(collection(db,'posts'),d);$('pReset').click()};
 
 function curPost(){return POSTS.find(p=>p.id===$('selPost').value)}
